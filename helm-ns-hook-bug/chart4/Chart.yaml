@@ -1,0 +1,6 @@
+apiVersion: v2
+name: app
+description: Chart with Namespace + ClusterRole, for triggering Update path
+type: application
+version: 0.1.0
+appVersion: "1.0.0"

@@ -1,0 +1,35 @@
+===============================================
+Helm 3.17.1 --create-namespace bug reproduction
+===============================================
+
+Helm version:
+version.BuildInfo{Version:"v3.17.1", GitCommit:"980d8ac1939e39138101364400756af2bdee1da5", GitTreeState:"clean", GoVersion:"go1.23.5"}
+
+===== Manifestation A: single Namespace template =====
+--- 1st install (fails) ---
+Error: INSTALLATION FAILED: 1 error occurred:
+	* namespaces "zzz" already exists
+
+
+--- state after 1st: ns exists, release 'failed' ---
+NAME	NAMESPACE	REVISION	UPDATED                                	STATUS	CHART    	APP VERSION
+app 	zzz      	1       	2026-04-24 09:05:56.770454265 +0000 UTC	failed	app-0.1.0	1.0.0      
+zzz={"kubernetes.io/metadata.name":"zzz","name":"zzz"}
+--- 2nd install (succeeds: upgrades 'failed' release) ---
+NAMESPACE: zzz
+STATUS: deployed
+REVISION: 2
+TEST SUITE: None
+NAME	NAMESPACE	REVISION	UPDATED                                	STATUS  	CHART    	APP VERSION
+app 	zzz      	2       	2026-04-24 09:05:57.121210977 +0000 UTC	deployed	app-0.1.0	1.0.0      
+
+===== Manifestation B: chart also has a cluster-scoped resource with pre-existing helm ownership =====
+--- pre-create ClusterRole with helm ownership labels (simulates prior install leftover) ---
+clusterrole.rbac.authorization.k8s.io/app-reader created
+--- helm install (1st) --- produces user's EXACT error ---
+Error: INSTALLATION FAILED: no Namespace with the name "ttt" found
+--- state after 1st ---
+NAME	NAMESPACE	REVISION	UPDATED                                	STATUS	CHART    	APP VERSION
+app 	ttt      	1       	2026-04-24 09:06:02.799429129 +0000 UTC	failed	app-0.1.0	1.0.0      
+ttt    Active   1s
+
