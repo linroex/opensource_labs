@@ -1,0 +1,163 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "vault-secrets-operator.fullname" . }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+{{ include "vault-secrets-operator.labels" . | indent 4 }}
+  {{- if .Values.podAnnotations }}
+  annotations:
+{{ include "vault-secrets-operator.annotations" . | indent 4 }}
+  {{- end }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  {{- with .Values.deploymentStrategy }}
+  strategy:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  selector:
+    matchLabels:
+{{ include "vault-secrets-operator.matchLabels" . | indent 6 }}
+  template:
+    metadata:
+      labels:
+{{ include "vault-secrets-operator.labels" . | indent 8 }}
+      {{- if .Values.podAnnotations }}
+      annotations:
+{{ include "vault-secrets-operator.annotations" . | indent 8 }}
+      {{- end }}
+    spec:
+      {{- with .Values.dnsConfig }}
+      dnsConfig:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.dnsPolicy }}
+      dnsPolicy: {{ . }}
+      {{- end }}
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ template "vault-secrets-operator.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      {{- if .Values.includeInitContainers }}
+      initContainers:
+      {{- include "vault-secrets-operator.initContainers" . | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: {{ .Chart.Name }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.image.repository }}{{ include "vault-secrets-operator.imageRef" . }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          command:
+            - /manager
+          {{- with .Values.args }}
+          args:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          env:
+            - name: WATCH_NAMESPACE
+            {{- if .Values.vault.namespaces }}
+              {{- if kindIs "slice" .Values.vault.namespaces }}
+              value: {{ .Values.vault.namespaces | join "," | quote }}
+              {{- else }}
+              value: {{ .Values.vault.namespaces | quote }}
+              {{- end -}}
+            {{- else if .Values.rbac.namespaced }}
+              value: {{ .Release.Namespace | quote }}
+            {{- else }}
+              value: ""
+            {{- end }}
+            {{- if .Values.vault.address }}
+            - name: VAULT_ADDRESS
+              value: {{ .Values.vault.address | quote }}
+            {{- end }}
+            {{- if .Values.vault.header }}
+            - name: VAULT_HEADER
+              value: {{ .Values.vault.header | quote }}
+            {{- end }}
+            - name: VAULT_AUTH_METHOD
+              value: {{ .Values.vault.authMethod | quote }}
+            - name: VAULT_TOKEN_PATH
+              value: {{ .Values.vault.tokenPath | quote }}
+            - name: VAULT_KUBERNETES_PATH
+              value: {{ .Values.vault.kubernetesPath | quote }}
+            - name: VAULT_KUBERNETES_ROLE
+              value: {{ .Values.vault.kubernetesRole | quote }}
+            - name: VAULT_APP_ROLE_PATH
+              value: {{ .Values.vault.appRolePath | quote }}
+            - name: VAULT_RECONCILIATION_TIME
+              value: {{ .Values.vault.reconciliationTime | quote }}
+            - name: VAULT_AZURE_PATH
+              value: {{ .Values.vault.azurePath | quote }}
+            - name: VAULT_AZURE_ROLE
+              value: {{ .Values.vault.azureRole | quote }}
+            - name: VAULT_AZURE_ISSCALESET
+              value: {{ .Values.vault.azureScaleset | quote }}
+            - name: VAULT_AWS_REGION
+              value: {{ .Values.vault.awsRegion | quote }}
+            - name: VAULT_AWS_PATH
+              value: {{ .Values.vault.awsPath | quote }}
+            - name: VAULT_AWS_AUTH_TYPE
+              value: {{ .Values.vault.awsAuthType | quote }}
+            - name: VAULT_AWS_ROLE
+              value: {{ .Values.vault.awsRole | quote }}
+            - name: VAULT_GCP_PATH
+              value: {{ .Values.vault.gcpPath | quote }}
+            - name: VAULT_GCP_AUTH_TYPE
+              value: {{ .Values.vault.gcpAuthType | quote }}
+            - name: VAULT_GCP_SERVICE_ACCOUNT_EMAIL
+              value: {{ .Values.vault.gcpServiceAccountEmail | quote }}
+            - name: VAULT_GCP_ROLE
+              value: {{ .Values.vault.gcpRole | quote }}
+
+            {{- with .Values.environmentVars }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
+          ports:
+            - name: http-metrics
+              containerPort: 8080
+              protocol: TCP
+            - name: http
+              containerPort: 8081
+              protocol: TCP
+          {{- with .Values.image.volumeMounts }}
+          volumeMounts:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+          readinessProbe:
+            httpGet:
+              path: /readyz
+              port: http
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+        {{- include "vault-secrets-operator.additionalContainers" . | nindent 8 }}
+      {{- with .Values.volumes }}
+      volumes:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.topologySpreadConstraints }}
+      topologySpreadConstraints:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- if .Values.priorityClassName }}
+      priorityClassName: {{ .Values.priorityClassName }}
+      {{- end }}

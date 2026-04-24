@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata: {name: consumer, namespace: app}
+spec:
+  replicas: 1
+  selector: {matchLabels: {app: consumer}}
+  template:
+    metadata: {labels: {app: consumer}}
+    spec:
+      terminationGracePeriodSeconds: 2
+      containers:
+      - name: reader
+        image: busybox:1.36
+        command: [/bin/sh, -c]
+        args:
+        - |
+          set -eu
+          while true; do
+            ts=$(date -u +%FT%TZ)
+            if [ -r /secret/foo ]; then
+              val=$(cat /secret/foo)
+              hash=$(printf '%s' "$val" | md5sum | cut -c1-8)
+              echo "$ts OK value=$val hash=$hash"
+            else
+              echo "$ts FAIL secret_missing"
+            fi
+            sleep 5
+          done
+        volumeMounts: [{name: s, mountPath: /secret, readOnly: true}]
+      volumes:
+      - name: s
+        secret: {secretName: helloworld}
