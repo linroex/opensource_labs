@@ -1,0 +1,9 @@
+1. Get the application URL by running these commands:
+
+  export POD_NAME=$(kubectl get pods --namespace {{ .Release.Namespace }} -l "app.kubernetes.io/name={{ include "vault-secrets-operator.name" . }},app.kubernetes.io/instance={{ .Release.Name }}" -o jsonpath="{.items[0].metadata.name}")
+  echo "Visit http://127.0.0.1:8686 to use your application"
+  kubectl port-forward $POD_NAME 8686
+
+{{ if contains "kubernetes" .Values.vault.authMethod }}
+2. Configure Vault using the "{{ template "vault-secrets-operator.serviceAccountName" . }}" ServiceAccount.
+{{ end }}
