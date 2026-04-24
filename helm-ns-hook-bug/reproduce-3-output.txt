@@ -1,0 +1,44 @@
+=== Helm version ===
+version.BuildInfo{Version:"v3.17.1", GitCommit:"980d8ac1939e39138101364400756af2bdee1da5", GitTreeState:"clean", GoVersion:"go1.23.5"}
+
+##################################################
+# Workaround attempt: drop --create-namespace, chart owns the ns
+##################################################
+ns uuu does not exist:
+Error from server (NotFound): namespaces "uuu" not found
+--- 1st helm install ---
+Error: INSTALLATION FAILED: create: failed to create: namespaces "uuu" not found
+--- state: NOTHING was created ---
+Error from server (NotFound): namespaces "uuu" not found
+NAME	NAMESPACE	REVISION	UPDATED	STATUS	CHART	APP VERSION
+--- 2nd helm install (also fails the same way — no recovery possible) ---
+Error: INSTALLATION FAILED: create: failed to create: namespaces "uuu" not found
+
+##################################################
+# Failed escape attempt 1: manually 'kubectl create ns uuu' first
+##################################################
+namespace/uuu created
+Error: INSTALLATION FAILED: Unable to continue with install: Namespace "uuu" in namespace "" exists and cannot be imported into the current release: invalid ownership metadata; label validation error: missing key "app.kubernetes.io/managed-by": must be set to "Helm"; annotation validation error: missing key "meta.helm.sh/release-name": must be set to "app"; annotation validation error: missing key "meta.helm.sh/release-namespace": must be set to "uuu"
+
+##################################################
+# Working workaround A: --take-ownership flag
+##################################################
+LAST DEPLOYED: Fri Apr 24 09:32:27 2026
+NAMESPACE: uuu
+STATUS: deployed
+REVISION: 1
+TEST SUITE: None
+NAME	NAMESPACE	REVISION	UPDATED                               	STATUS  	CHART    	APP VERSION
+app 	uuu      	1       	2026-04-24 09:32:27.46292814 +0000 UTC	deployed	app-0.1.0	1.0.0      
+
+##################################################
+# Working workaround B: pre-create ns WITH helm ownership labels
+##################################################
+namespace/uuu created
+LAST DEPLOYED: Fri Apr 24 09:32:31 2026
+NAMESPACE: uuu
+STATUS: deployed
+REVISION: 1
+TEST SUITE: None
+NAME	NAMESPACE	REVISION	UPDATED                                	STATUS  	CHART    	APP VERSION
+app 	uuu      	1       	2026-04-24 09:32:31.721099656 +0000 UTC	deployed	app-0.1.0	1.0.0      

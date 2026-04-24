@@ -1,0 +1,37 @@
+=== Helm version ===
+version.BuildInfo{Version:"v3.17.1", GitCommit:"980d8ac1939e39138101364400756af2bdee1da5", GitTreeState:"clean", GoVersion:"go1.23.5"}
+
+##################################################
+# Manifestation A: chart has only Namespace + ConfigMap
+##################################################
+--- 1st helm install: fails with 'namespaces already exists' ---
+Error: INSTALLATION FAILED: 1 error occurred:
+	* namespaces "zzz" already exists
+
+
+--- helm list -A (release recorded as 'failed'):
+NAME	NAMESPACE	REVISION	UPDATED                                	STATUS	CHART    	APP VERSION
+app 	zzz      	1       	2026-04-24 09:07:16.409522817 +0000 UTC	failed	app-0.1.0	1.0.0      
+--- ns zzz exists without helm ownership labels:
+{"kubernetes.io/metadata.name":"zzz","name":"zzz"}
+--- 2nd run with 'helm upgrade --install' succeeds (goes through upgrade path):
+LAST DEPLOYED: Fri Apr 24 09:07:16 2026
+NAMESPACE: zzz
+STATUS: deployed
+REVISION: 2
+TEST SUITE: None
+NAME	NAMESPACE	REVISION	UPDATED                                	STATUS  	CHART    	APP VERSION
+app 	zzz      	2       	2026-04-24 09:07:16.827779136 +0000 UTC	deployed	app-0.1.0	1.0.0      
+
+##################################################
+# Manifestation B: chart also has a cluster-scoped resource (ClusterRole)
+# that already exists in cluster with helm ownership labels (leftover state)
+##################################################
+--- Pre-create ClusterRole with helm ownership labels ---
+clusterrole.rbac.authorization.k8s.io/app-reader created
+--- 1st helm install: fails with the user's exact error ---
+Error: INSTALLATION FAILED: no Namespace with the name "ttt" found
+--- state: ns ttt was still created ---
+ttt    Active   0s
+NAME	NAMESPACE	REVISION	UPDATED                               	STATUS	CHART    	APP VERSION
+app 	ttt      	1       	2026-04-24 09:07:22.60557118 +0000 UTC	failed	app-0.1.0	1.0.0      

@@ -1,0 +1,36 @@
+=== Helm version ===
+version.BuildInfo{Version:"v3.17.1", GitCommit:"980d8ac1939e39138101364400756af2bdee1da5", GitTreeState:"clean", GoVersion:"go1.23.5"}
+
+=== Clean previous run ===
+
+=== Case A: namespace.yaml WITH helm.sh/hook: pre-install ===
+Release "app" does not exist. Installing it now.
+NAME: app
+LAST DEPLOYED: Fri Apr 24 08:40:42 2026
+NAMESPACE: xxx
+STATUS: deployed
+REVISION: 1
+TEST SUITE: None
+helm list -A:
+NAME	NAMESPACE	REVISION	UPDATED	STATUS	CHART	APP VERSION
+secrets in xxx:
+No resources found in xxx namespace.
+
+=== Case B: control - no namespace.yaml, just --create-namespace ===
+Release "app" does not exist. Installing it now.
+NAME: app
+LAST DEPLOYED: Fri Apr 24 08:40:48 2026
+NAMESPACE: yyy
+STATUS: deployed
+REVISION: 1
+TEST SUITE: None
+helm list -A:
+NAME	NAMESPACE	REVISION	UPDATED                                	STATUS  	CHART    	APP VERSION
+app 	yyy      	1       	2026-04-24 08:40:48.461449368 +0000 UTC	deployed	app-0.1.0	1.0.0      
+secrets in yyy:
+NAME                        TYPE                 DATA   AGE
+sh.helm.release.v1.app.v1   helm.sh/release.v1   1      0s
+
+=== Expected (Helm 3.17.1 bug) ===
+Case A: 'STATUS: deployed' shown, but helm list empty, no sh.helm.release secret
+Case B: release properly recorded, sh.helm.release.v1.app.v1 secret exists

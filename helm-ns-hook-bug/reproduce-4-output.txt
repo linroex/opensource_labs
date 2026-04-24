@@ -1,0 +1,25 @@
+=== Helm version ===
+version.BuildInfo{Version:"v3.17.1", GitCommit:"980d8ac1939e39138101364400756af2bdee1da5", GitTreeState:"clean", GoVersion:"go1.23.5"}
+
+=== chart/templates/namespace.yaml (has pre-install hook) ===
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: {{ .Release.Namespace }}
+  annotations:
+    "helm.sh/hook": pre-install
+    "helm.sh/hook-weight": "-5"
+
+=== Test: helm install with hook'd namespace, NO --create-namespace ===
+ns vvv does not exist:
+Error from server (NotFound): namespaces "vvv" not found
+
+--- 1st helm install ---
+Error: INSTALLATION FAILED: create: failed to create: namespaces "vvv" not found
+
+--- state: NOTHING was created ---
+Error from server (NotFound): namespaces "vvv" not found
+NAME	NAMESPACE	REVISION	UPDATED	STATUS	CHART	APP VERSION
+
+--- 2nd run (same error, no recovery possible) ---
+Error: INSTALLATION FAILED: create: failed to create: namespaces "vvv" not found
