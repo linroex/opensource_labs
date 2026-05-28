@@ -12,8 +12,13 @@ Minimal "Hello, World" HTML page served by nginx on a single-node k3s cluster.
 ## Apply
 
 Assumes a k3s cluster is running and `KUBECONFIG` points at it (e.g.
-`/etc/rancher/k3s/k3s.yaml`). For sandbox setup, see
-`.claude/skills/k3s-experiment/SKILL.md`.
+`/etc/rancher/k3s/k3s.yaml`). To bootstrap a single-node cluster from
+scratch, use `scripts/k3s-init.sh` at the repo root:
+
+```bash
+sudo ../scripts/k3s-init.sh
+export KUBECONFIG=/etc/rancher/k3s/k3s.yaml
+```
 
 ```bash
 kubectl apply -f manifests/hello-world.yaml
