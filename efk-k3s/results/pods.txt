@@ -1,0 +1,4 @@
+NAME                     READY   STATUS    RESTARTS   AGE   IP          NODE   NOMINATED NODE   READINESS GATES
+elasticsearch-0          1/1     Running   0          99s   10.42.0.7   vm     <none>           <none>
+fluentd-h49p9            1/1     Running   0          98s   10.42.0.6   vm     <none>           <none>
+kibana-544bdf84d-kfznm   1/1     Running   0          99s   10.42.0.5   vm     <none>           <none>

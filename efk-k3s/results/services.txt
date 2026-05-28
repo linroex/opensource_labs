@@ -1,0 +1,3 @@
+NAME            TYPE        CLUSTER-IP     EXTERNAL-IP   PORT(S)             AGE
+elasticsearch   ClusterIP   None           <none>        9200/TCP,9300/TCP   99s
+kibana          NodePort    10.43.248.11   <none>        5601:30561/TCP      99s

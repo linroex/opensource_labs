@@ -1,0 +1,65 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: fluentd-config
+  namespace: logging
+data:
+  fluent.conf: |
+    # Read container logs from k3s/containerd JSON files
+    <source>
+      @type tail
+      @id in_tail_container_logs
+      path /var/log/containers/*.log
+      pos_file /var/log/fluentd-containers.log.pos
+      tag kubernetes.*
+      read_from_head true
+      <parse>
+        @type cri
+      </parse>
+    </source>
+
+    # Enrich with k8s metadata (pod, namespace, labels)
+    <filter kubernetes.**>
+      @type kubernetes_metadata
+      @id filter_kube_metadata
+      skip_labels false
+      skip_container_metadata false
+      skip_namespace_metadata true
+      skip_master_url true
+    </filter>
+
+    # Drop fluentd's own logs to avoid loops
+    <match kubernetes.var.log.containers.fluentd**>
+      @type null
+    </match>
+
+    # Ship everything else to Elasticsearch
+    <match **>
+      @type elasticsearch
+      @id out_es
+      host elasticsearch.logging.svc
+      port 9200
+      scheme http
+      logstash_format true
+      logstash_prefix k8s
+      include_tag_key true
+      type_name _doc
+      suppress_type_name true
+      request_timeout 30s
+      reload_connections false
+      reconnect_on_error true
+      reload_on_failure true
+      <buffer>
+        @type file
+        path /var/log/fluentd-buffers/kubernetes.system.buffer
+        flush_mode interval
+        flush_interval 5s
+        flush_thread_count 2
+        retry_forever false
+        retry_max_interval 30
+        chunk_limit_size 2M
+        queue_limit_length 8
+        overflow_action block
+      </buffer>
+    </match>
