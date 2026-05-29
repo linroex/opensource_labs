@@ -1,0 +1,78 @@
+# NEGATIVE TEST: these are the parameters that DO NOT work against
+# Vector's `fluent` source. Deployed alongside the good one to contrast.
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: fluentd-bad-config
+  namespace: logpipe
+data:
+  fluent.conf: |
+    <source>
+      @type sample
+      tag bad.log
+      sample {"message":"this should NOT arrive","svc":"bad"}
+      rate 5
+    </source>
+
+    <label @FLUENT_LOG>
+      <match fluent.**>
+        @type stdout
+      </match>
+    </label>
+
+    <match bad.**>
+      @type forward
+      # WRONG #1: Vector's fluent source does NOT implement the forward
+      # handshake / shared-key auth (PING/PONG with shared_key + nonce).
+      # With a <security> block fluentd expects a HELO/PONG handshake that
+      # Vector never performs -> connection is rejected / never established.
+      <security>
+        self_hostname fluentd-bad
+        shared_key supersecret
+      </security>
+
+      # WRONG #2: udp heartbeat. Vector listens on TCP only and never
+      # answers UDP heartbeats, so the node is detected "dead".
+      heartbeat_type udp
+
+      <server>
+        name vector
+        host vector
+        port 24224
+      </server>
+      <buffer>
+        flush_interval 1s
+        retry_max_times 3
+      </buffer>
+    </match>
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: fluentd-bad
+  namespace: logpipe
+  labels:
+    app: fluentd-bad
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: fluentd-bad
+  template:
+    metadata:
+      labels:
+        app: fluentd-bad
+    spec:
+      containers:
+        - name: fluentd
+          image: fluent/fluentd:v1.17-debian-1
+          env:
+            - name: FLUENTD_CONF
+              value: fluent.conf
+          volumeMounts:
+            - name: config
+              mountPath: /fluentd/etc
+      volumes:
+        - name: config
+          configMap:
+            name: fluentd-bad-config

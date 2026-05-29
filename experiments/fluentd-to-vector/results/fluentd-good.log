@@ -1,0 +1,12 @@
+2026-05-29 03:21:58 +0000 [info]: adding match in @FLUENT_LOG pattern="fluent.**" type="stdout"
+2026-05-29 03:21:58 +0000 [info]: adding match pattern="test.**" type="forward"
+2026-05-29 03:21:58 +0000 [info]: #0 adding forwarding server 'vector' host="vector" port=24224 weight=60 plugin_id="object:974"
+2026-05-29 03:21:58 +0000 [info]: adding source type="sample"
+2026-05-29 03:21:58 +0000 [warn]: #0 both of Plugin @id and path for <storage> are not specified. Using on-memory store.
+2026-05-29 03:21:58 +0000 [warn]: #0 both of Plugin @id and path for <storage> are not specified. Using on-memory store.
+2026-05-29 03:21:58 +0000 [info]: #0 starting fluentd worker pid=16 ppid=7 worker=0
+2026-05-29 03:21:58 +0000 [info]: #0 delayed_commit_timeout is overwritten by ack_response_timeout
+2026-05-29 03:21:58 +0000 [info]: #0 fluentd worker is now running worker=0
+2026-05-29 03:21:58.070661184 +0000 fluent.info: {"pid":16,"ppid":7,"worker":0,"message":"starting fluentd worker pid=16 ppid=7 worker=0"}
+2026-05-29 03:21:58.071184212 +0000 fluent.info: {"message":"delayed_commit_timeout is overwritten by ack_response_timeout"}
+2026-05-29 03:21:58.072019513 +0000 fluent.info: {"worker":0,"message":"fluentd worker is now running worker=0"}

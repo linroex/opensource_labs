@@ -1,0 +1,5 @@
+# Captured from the fluentd-bad pod when configured with `heartbeat_type udp`
+# (Vector's fluent source never answers UDP heartbeats, so fluentd's phi-accrual
+#  failure detector crosses its threshold and detaches the server -> 0 delivery).
+2026-05-29 03:24:02 +0000 [warn]: #0 detached forwarding server 'vector' host="vector" port=24224 phi=16.12131025679757 phi_threshold=16
+2026-05-29 03:24:02.120728737 +0000 fluent.warn: {"host":"vector","port":24224,"phi":16.12131025679757,"phi_threshold":16,"message":"detached forwarding server 'vector' host=\"vector\" port=24224 phi=16.12131025679757 phi_threshold=16"}

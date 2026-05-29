@@ -1,0 +1,115 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: vector-config
+  namespace: logpipe
+data:
+  vector.yaml: |
+    # Vector receives logs over the Fluentd Forward Protocol.
+    # The `fluent` source speaks the same wire format that fluentd's
+    # out_forward plugin emits. It listens on TCP only.
+    data_dir: /vector-data-dir
+    api:
+      enabled: true
+      address: 0.0.0.0:8686
+
+    sources:
+      fluent_in:
+        type: fluent
+        address: 0.0.0.0:24224
+
+    sinks:
+      # Print everything we receive so we can verify delivery from the logs.
+      stdout:
+        type: console
+        inputs: [fluent_in]
+        encoding:
+          codec: json
+      # Also expose an internal metrics counter so we can prove component throughput.
+      prom:
+        type: prometheus_exporter
+        inputs: [internal_metrics_src]
+        address: 0.0.0.0:9090
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: vector-config-metrics
+  namespace: logpipe
+data:
+  # merged in via a second config file path
+  metrics.yaml: |
+    sources:
+      internal_metrics_src:
+        type: internal_metrics
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: vector
+  namespace: logpipe
+  labels:
+    app: vector
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: vector
+  template:
+    metadata:
+      labels:
+        app: vector
+    spec:
+      containers:
+        - name: vector
+          image: timberio/vector:0.40.0-debian
+          args:
+            - --config-dir
+            - /etc/vector
+          ports:
+            - containerPort: 24224
+              name: fluent
+            - containerPort: 8686
+              name: api
+            - containerPort: 9090
+              name: metrics
+          volumeMounts:
+            - name: config
+              mountPath: /etc/vector
+            - name: data
+              mountPath: /vector-data-dir
+      volumes:
+        - name: config
+          projected:
+            sources:
+              - configMap:
+                  name: vector-config
+                  items:
+                    - key: vector.yaml
+                      path: vector.yaml
+              - configMap:
+                  name: vector-config-metrics
+                  items:
+                    - key: metrics.yaml
+                      path: metrics.yaml
+        - name: data
+          emptyDir: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: vector
+  namespace: logpipe
+spec:
+  selector:
+    app: vector
+  ports:
+    - name: fluent
+      port: 24224
+      targetPort: 24224
+    - name: api
+      port: 8686
+      targetPort: 8686
+    - name: metrics
+      port: 9090
+      targetPort: 9090

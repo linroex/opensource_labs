@@ -1,0 +1,8 @@
+{"host":"10.42.0.5","message":"hello from fluentd","source_type":"fluent","svc":"demo","tag":"test.log","timestamp":"2026-05-29T03:26:45.075983587Z"}
+{"host":"10.42.0.5","message":"hello from fluentd","source_type":"fluent","svc":"demo","tag":"test.log","timestamp":"2026-05-29T03:26:45.076002465Z"}
+{"host":"10.42.0.5","message":"hello from fluentd","source_type":"fluent","svc":"demo","tag":"test.log","timestamp":"2026-05-29T03:26:45.076019568Z"}
+{"host":"10.42.0.5","message":"hello from fluentd","source_type":"fluent","svc":"demo","tag":"test.log","timestamp":"2026-05-29T03:26:46.077887847Z"}
+{"host":"10.42.0.5","message":"hello from fluentd","source_type":"fluent","svc":"demo","tag":"test.log","timestamp":"2026-05-29T03:26:46.078038365Z"}
+{"host":"10.42.0.5","message":"hello from fluentd","source_type":"fluent","svc":"demo","tag":"test.log","timestamp":"2026-05-29T03:26:46.078058958Z"}
+{"host":"10.42.0.5","message":"hello from fluentd","source_type":"fluent","svc":"demo","tag":"test.log","timestamp":"2026-05-29T03:26:46.078076369Z"}
+{"host":"10.42.0.5","message":"hello from fluentd","source_type":"fluent","svc":"demo","tag":"test.log","timestamp":"2026-05-29T03:26:46.078091923Z"}

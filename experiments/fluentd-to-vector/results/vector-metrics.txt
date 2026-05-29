@@ -1,0 +1,4 @@
+vector_component_received_events_total{component_id="stdout",component_kind="sink",component_type="console",host="vector-7f89545455-cs6zp"} 1460 1780025211829
+vector_component_received_events_total{component_id="fluent_in",component_kind="source",component_type="fluent",host="vector-7f89545455-cs6zp"} 1460 1780025211829
+vector_component_sent_events_total{component_id="stdout",component_kind="sink",component_type="console",host="vector-7f89545455-cs6zp"} 1460 1780025211829
+vector_component_sent_events_total{component_id="fluent_in",component_kind="source",component_type="fluent",host="vector-7f89545455-cs6zp",output="_default"} 1460 1780025211829
