@@ -1,0 +1,139 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: os
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: opensearch-config
+  namespace: os
+data:
+  opensearch.yml: |
+    cluster.name: demo-cluster
+    network.host: 0.0.0.0
+    discovery.seed_hosts:
+      - opensearch-master-0.opensearch-master-headless.os.svc.cluster.local
+      - opensearch-master-1.opensearch-master-headless.os.svc.cluster.local
+      - opensearch-master-2.opensearch-master-headless.os.svc.cluster.local
+    cluster.initial_cluster_manager_nodes:
+      - opensearch-master-0
+      - opensearch-master-1
+      - opensearch-master-2
+    plugins.security.disabled: true
+    node.roles:
+      - cluster_manager
+      - data
+      - ingest
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: opensearch-master-headless
+  namespace: os
+spec:
+  clusterIP: None
+  publishNotReadyAddresses: true
+  selector:
+    app: opensearch-master
+  ports:
+    - name: http
+      port: 9200
+    - name: transport
+      port: 9300
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: opensearch
+  namespace: os
+spec:
+  selector:
+    app: opensearch-master
+  ports:
+    - name: http
+      port: 9200
+      targetPort: 9200
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: opensearch-master
+  namespace: os
+spec:
+  serviceName: opensearch-master-headless
+  replicas: 3
+  podManagementPolicy: Parallel
+  selector:
+    matchLabels:
+      app: opensearch-master
+  template:
+    metadata:
+      labels:
+        app: opensearch-master
+    spec:
+      terminationGracePeriodSeconds: 30
+      initContainers:
+        - name: sysctl
+          image: busybox:1.36
+          securityContext:
+            privileged: true
+            runAsUser: 0
+          command:
+            - sh
+            - -c
+            - |
+              sysctl -w vm.max_map_count=262144 || true
+              chown -R 1000:1000 /usr/share/opensearch/data || true
+          volumeMounts:
+            - name: data
+              mountPath: /usr/share/opensearch/data
+      containers:
+        - name: opensearch
+          image: docker.io/opensearchproject/opensearch:2.13.0
+          env:
+            - name: node.name
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: OPENSEARCH_JAVA_OPTS
+              value: "-Xms512m -Xmx512m"
+            - name: DISABLE_INSTALL_DEMO_CONFIG
+              value: "true"
+            - name: DISABLE_SECURITY_PLUGIN
+              value: "true"
+          ports:
+            - name: http
+              containerPort: 9200
+            - name: transport
+              containerPort: 9300
+          volumeMounts:
+            - name: config
+              mountPath: /usr/share/opensearch/config/opensearch.yml
+              subPath: opensearch.yml
+            - name: data
+              mountPath: /usr/share/opensearch/data
+            - name: patched-jar
+              mountPath: /usr/share/opensearch/lib/opensearch-2.13.0.jar
+              subPath: opensearch-2.13.0.jar
+          readinessProbe:
+            tcpSocket:
+              port: 9200
+            initialDelaySeconds: 20
+            periodSeconds: 5
+      volumes:
+        - name: config
+          configMap:
+            name: opensearch-config
+        - name: patched-jar
+          hostPath:
+            path: /var/lib/opensearch-patch
+            type: Directory
+  volumeClaimTemplates:
+    - metadata:
+        name: data
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        resources:
+          requests:
+            storage: 1Gi
