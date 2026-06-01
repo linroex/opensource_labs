@@ -1,0 +1,30 @@
+==========================================================
+TAG: baseline   time=2026-06-01T08:45:23Z
+==========================================================
+--- K8s pod IPs ---
+opensearch-master-0   10.42.0.46   false
+opensearch-master-1   10.42.0.45   false
+opensearch-master-2   10.42.0.44   false
+--- opensearch-master-0: NOT_READY (skipping query) ---
+--- opensearch-master-1: NOT_READY (skipping query) ---
+--- opensearch-master-2: NOT_READY (skipping query) ---
+
+*** Restarting opensearch-master-2 ***
+    old uid=b74a876a-5469-495a-9d06-f93c88ba9952 old ip=10.42.0.44
+==========================================================
+TAG: after_restart_m2   time=2026-06-01T08:51:49Z
+==========================================================
+--- K8s pod IPs ---
+opensearch-master-0   10.42.0.46   true
+opensearch-master-1   10.42.0.45   true
+opensearch-master-2   10.42.0.47   false
+--- opensearch-master-0's view of cluster nodes (_cat/nodes) ---
+KIhU opensearch-master-0 10.42.0.46 -
+j0lw opensearch-master-1 10.42.0.45 *
+--- opensearch-master-1's view of cluster nodes (_cat/nodes) ---
+KIhU opensearch-master-0 10.42.0.46 -
+j0lw opensearch-master-1 10.42.0.45 *
+--- opensearch-master-2: NOT_READY (skipping query) ---
+
+*** Restarting opensearch-master-1 ***
+    old uid=b710e975-aad5-4786-8a32-edeb4f5fc9d0 old ip=10.42.0.45
