@@ -1,0 +1,17 @@
+=== Big5 vs UTF-8 Byte Analysis ===
+
+Message: 這是一段繁體中文測試訊息
+  UTF-8 bytes (36): e98099e698afe4b880e6aeb5e7b981e9ab94e4b8ade69687e6b8ace8a9a6e8a88ae681af
+  Big5  bytes (24): b36fac4fa440ac71c163c5e9a4a4a4e5b4fab8d5b054aea7
+  Big5 as UTF-8 -> ERROR at byte 0: invalid start byte
+
+Message: 使用者登入失敗，帳號或密碼錯誤
+  UTF-8 bytes (45): e4bdbfe794a8e88085e799bbe585a5e5a4b1e69597efbc8ce5b8b3e8999fe68896e5af86e7a2bce98cafe8aaa4
+  Big5  bytes (30): a8cfa5ceaaccb56ea44aa5a2b1d1a141b162b8b9a9ceb14bbd58bff9bb7e
+  Big5 as UTF-8 -> ERROR at byte 0: invalid start byte
+
+Message: 系統錯誤：無法連線至資料庫
+  UTF-8 bytes (39): e7b3bbe7b5b1e98cafe8aaa4efbc9ae784a1e6b395e980a3e7b79ae887b3e8b387e69699e5baab
+  Big5  bytes (26): a874b2cebff9bb7ea147b54caa6bb373bd75a6dcb8eaaec6ae77
+  Big5 as UTF-8 -> ERROR at byte 0: invalid start byte
+
