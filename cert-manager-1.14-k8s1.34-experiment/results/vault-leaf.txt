@@ -1,0 +1,6 @@
+issuer=CN = vault-experiment-root
+subject=CN = vaultapp.example.test
+notBefore=Jun 29 08:11:09 2026 GMT
+notAfter=Jun 29 09:11:39 2026 GMT
+X509v3 Subject Alternative Name: 
+    DNS:vaultapp.example.test

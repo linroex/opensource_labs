@@ -1,0 +1,14 @@
+# Renewal results (k8s 1.34.9, cert-manager 1.14.7)
+
+self-signed leaf:
+  baseline serial : CC8FF5E9E8DC6329BB88F0C7B8A2EBFE
+  renewed  serial : 203374C1258B323B2F10F83CBF23F9C7  @08:14:14Z
+  renewed chain verify: OK
+
+vault leaf:
+  baseline serial : 0D0FEE47DEC6BBA5C39EC1C94EAAA7DC6688702B
+  renewed  serial : 2E5A149211C998989A1548EB46ACF230FBF51168  @08:16:46Z
+  renewed chain verify: OK
+
+Both certificates auto-renewed by cert-manager's renewal controller at their scheduled renewalTime.
+Zero pod restarts throughout. No API deprecation / version-skew warnings observed.

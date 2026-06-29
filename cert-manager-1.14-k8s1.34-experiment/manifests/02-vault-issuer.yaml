@@ -1,0 +1,31 @@
+apiVersion: cert-manager.io/v1
+kind: Issuer
+metadata:
+  name: vault-issuer
+  namespace: cm-test
+spec:
+  vault:
+    server: http://vault.vault:8200
+    path: pki/sign/example-dot-test
+    auth:
+      kubernetes:
+        role: cert-manager
+        mountPath: /v1/auth/kubernetes
+        serviceAccountRef:
+          name: cert-manager-vault
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: leaf-vault
+  namespace: cm-test
+spec:
+  secretName: leaf-vault-secret
+  commonName: vaultapp.example.test
+  dnsNames:
+    - vaultapp.example.test
+  duration: 1h
+  renewBefore: 55m
+  issuerRef:
+    name: vault-issuer
+    kind: Issuer
