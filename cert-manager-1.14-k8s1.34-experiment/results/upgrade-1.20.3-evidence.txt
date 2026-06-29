@@ -1,0 +1,22 @@
+# Upgrade evidence (1.14.7 -> 1.20.3 on k8s 1.34.9)
+
+## helm release
+cert-manager	cert-manager	2       	2026-06-29 08:27:09.81826939 +0000 UTC	deployed	cert-manager-v1.20.3	v1.20.3    
+
+## pods
+cert-manager-7d4dcb586c-8jkr2             quay.io/jetstack/cert-manager-controller:v1.20.3   true   0
+cert-manager-cainjector-7655b9c95-5v2vx   quay.io/jetstack/cert-manager-cainjector:v1.20.3   true   0
+cert-manager-webhook-7cdcf7f6f4-cq5fx     quay.io/jetstack/cert-manager-webhook:v1.20.3      true   0
+
+## CRD ownership
+served:v1 managed-by:Helm resource-policy:keep
+
+## post-upgrade certs
+NAME              READY   SECRET                   AGE
+leaf-selfsigned   True    leaf-selfsigned-secret   20m
+leaf-vault        True    leaf-vault-secret        18m
+root-ca           True    root-ca-secret           20m
+
+## post-upgrade renewal serials
+selfsigned: serial=44B0F97814CF35B97836F240F23045D47204E13B
+vault:      serial=1877A68760EE74937ED929951CDB7CD42EE280A9
