@@ -1,0 +1,15 @@
+# VSO 1.26.0 — token-renewal ENABLED phase (used in RESULTS.md S7).
+# Demonstrates that /healthz reacts only to token-renewal failures.
+# Requires a RENEWABLE vault token, e.g.:
+#   vault token create -period=1h -field=token
+image: {repository: ghcr.io/ricoberger/vault-secrets-operator, tag: v1.26.0, pullPolicy: IfNotPresent}
+vault:
+  address: "http://vault.vault.svc.cluster.local:8200"
+  authMethod: token
+  reconciliationTime: 30
+environmentVars:
+  - {name: VAULT_TOKEN, value: "<RENEWABLE_TOKEN>"}      # vault token create -period=1h
+  - {name: VAULT_TOKEN_LEASE_DURATION, value: "3600"}
+  - {name: VAULT_RENEW_TOKEN, value: "true"}
+  - {name: VAULT_TOKEN_RENEWAL_INTERVAL, value: "5"}        # renew every 5s (fast, for the demo)
+  - {name: VAULT_TOKEN_RENEWAL_RETRY_INTERVAL, value: "5"}  # retry failed renew every 5s

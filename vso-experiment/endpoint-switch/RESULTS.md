@@ -80,6 +80,32 @@ SAN **只簽了 `vault-tls.vault.svc.cluster.local`**。VSO 透過 `VAULT_CACERT
 > 這是真實世界「IP→domain」最常見的破壞點：原本用 IP（或舊 domain）連、憑證沒簽新名稱，
 > 一換 domain 就 x509 失敗。好消息是它**不會弄丟 application 的 secret**，只會讓它停在最後一次成功的值。
 
+### S7：Vault 連不上時 `/healthz`（liveness）回什麼？
+
+**重點：`/healthz`/`/readyz` 只反映「token 續租」健康，完全不反映「secret 是否抓得到」。**
+
+程式碼路徑（`main.go:127-145`、`vault/client.go:97-104`）：
+- `/healthz` → `GetHealth(10)`、`/readyz` → `GetHealth(5)`：只有在 `failedRenewTokenAttempts >= 門檻` 時才回錯誤(500)。
+- `failedRenewTokenAttempts` **只在 token 續租迴圈 `RenewToken()` 內增減**（client.go:74/88），
+  reconcile / `GetSecret` 失敗**不會**動到它。
+- 續租迴圈只有 `VAULT_RENEW_TOKEN=true` 才會啟動（`main.go:64`）；若 shared client 為 nil（純 vaultRole 模式）`/healthz` 永遠回 nil(200)。
+
+實測兩種設定（把 Vault scale 到 0 模擬連不上）：
+
+| 設定 | Vault 連不上時的觀察 |
+|---|---|
+| **`VAULT_RENEW_TOKEN=false`**（本實驗其餘情境用的設定） | CR 全 `FetchFailed`、一個 secret 都抓不到，但 **`/healthz`=200、`/readyz`=200、0 重啟**。operator 回報「健康」卻完全無法工作。 |
+| **`VAULT_RENEW_TOKEN=true` + 可續租 token** | 續租每 5s 失敗一次、`failedRenewTokenAttempts` 累加：**~41s 時 `/readyz`→500**（達門檻 5），**~90s 時 `/healthz`→500**（達門檻 10），接著 liveness 連續失敗觸發 **pod 重啟**（event: `Liveness probe failed: HTTP probe failed with statuscode: 500`）。 |
+
+實務意義：
+1. **不能用 `/healthz` 當「Vault 連線健康」的指標。** Vault 掛掉、DNS 壞掉、憑證不符導致 secret 全部停更時，
+   只要 token 續租沒在跑（或不需要續租），liveness 仍是綠的，pod 不會自我重啟、不會告警。
+   要偵測「VSO 抓不到 secret」必須看 **VaultSecret CR 的 `SucceededReason=FetchFailed`** 或 operator 的
+   reconcile error / metrics，而不是 liveness。
+2. 反過來，當你**有**開 token 續租而 Vault 連不上，`/healthz` 會在約 10 次續租失敗後翻 500 → pod 被
+   liveness 重啟。重啟也救不了「Vault 連不上」，只會進入 CrashLoop，但至少這個訊號看得到。
+3. `/readyz`（門檻 5）比 `/healthz`（門檻 10）早一半翻 500，可當較早的預警。
+
 ## 結論
 
 **對「同一座 Vault」改 endpoint（IP↔domain、A↔B domain），只要新位址可達，掛載 secret 的
