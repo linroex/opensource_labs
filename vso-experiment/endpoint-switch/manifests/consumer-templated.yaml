@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata: {name: consumer-templated, namespace: app}
+spec:
+  replicas: 1
+  selector: {matchLabels: {app: consumer-templated}}
+  template:
+    metadata: {labels: {app: consumer-templated}}
+    spec:
+      terminationGracePeriodSeconds: 2
+      containers:
+      - name: reader
+        image: busybox:1.36
+        command: [/bin/sh, -c]
+        args:
+        - |
+          set -eu
+          while true; do
+            ts=$(date -u +%FT%TZ)
+            if [ -r /secret/addr ] && [ -r /secret/foo ]; then
+              addr=$(cat /secret/addr); val=$(cat /secret/foo)
+              echo "$ts OK foo=$val addr=$addr"
+            else
+              echo "$ts FAIL secret_missing"
+            fi
+            sleep 5
+          done
+        volumeMounts: [{name: s, mountPath: /secret, readOnly: true}]
+      volumes:
+      - name: s
+        secret: {secretName: templated}

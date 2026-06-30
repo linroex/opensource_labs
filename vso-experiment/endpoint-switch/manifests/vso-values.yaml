@@ -1,0 +1,17 @@
+# VSO 1.26.0 helm values — token auth against dev Vault
+image:
+  repository: ghcr.io/ricoberger/vault-secrets-operator
+  tag: v1.26.0
+  pullPolicy: IfNotPresent
+vault:
+  # INITIAL endpoint = Service ClusterIP (an IP, not a domain)
+  address: "http://10.43.164.80:8200"
+  authMethod: token
+  reconciliationTime: 30
+environmentVars:
+  - name: VAULT_TOKEN
+    value: "root"
+  - name: VAULT_TOKEN_LEASE_DURATION
+    value: "86400"
+  - name: VAULT_RENEW_TOKEN          # dev root token isn't renewable; disable to avoid health-probe restarts
+    value: "false"
