@@ -12,6 +12,7 @@ application 會不會受影響、secret 會不會消失、短暫讀不到，或�
 | Vault | `hashicorp/vault:1.18`，dev 模式，KV v2 (`kvv2/`)，token auth (root) |
 | VSO | `ghcr.io/ricoberger/vault-secrets-operator:v1.26.0`，token auth，`reconciliationTime=30s`，`VAULT_RENEW_TOKEN=false`(註1) |
 | 「同一座 Vault、不同 endpoint」 | 單一 Vault pod，前面掛多個 Service：`vault`(ClusterIP=IP)、`vault.vault.svc`(domainA)、`vault-b.vault.svc`(domainB)、`vault-missing.vault.svc`(後補) |
+| HTTPS 情境 (S6) | nginx TLS 終結 (`manifests/vault-tls-proxy.yaml`)，憑證 SAN 只簽 `vault-tls.vault.svc`；Service `vault-tls`(相符)/`vault-tls-b`(不符) 同指 nginx；VSO 用 `vso-values-tls.yaml` 掛 CA + `VAULT_CACERT` |
 
 > 註1：dev 的 root token 不可續租，會讓 VSO 的 token-renew 迴圈持續失敗、累積到 liveness 門檻而重啟 pod，
 > 這與「位址切換」無關。為隔離變因把 renew 關掉。生產環境用可續租的 periodic token 即無此雜訊。
@@ -43,6 +44,8 @@ application 會不會受影響、secret 會不會消失、短暫讀不到，或�
 | S3a | → **不存在的 domain** | CR=`FetchFailed`(DNS no such host)，**secret 仍在**、rv 不變 | CR=`FetchFailed`，**secret 仍在**、保留最後good值(domainB) | 零 FAIL，hash 不變 |
 | S3b | 補上 `vault-missing` Service | ~15s 後 `Updated` 自動恢復 | 自動恢復，`addr`→vault-missing | 零 FAIL（全程未中斷） |
 | S5 | 改 deployment env **但不重啟 pod** | 既有 pod env 仍是舊值、仍連舊位址 | 同左 | 無任何變化（位址未生效） |
+| S6 | **HTTPS，換到憑證 SAN 不符的 domain** | CR=`FetchFailed`(x509)，**secret 仍在**、rv 不變(1887) | CR=`FetchFailed`，**secret 仍在**、保留最後good值 | 零 FAIL，hash 不變 |
+| S6b | 同上 + `VAULT_SKIP_VERIFY=true`（不安全旁路） | ~17s 後 `Updated` 恢復（略過憑證驗證） | 恢復 | 零 FAIL |
 
 ### 量化驗證（`results/` 內的 log 與快照）
 - **FAIL 次數：0 / 0**（兩個 consumer 全程沒有一次讀不到 secret）。
@@ -52,6 +55,30 @@ application 會不會受影響、secret 會不會消失、短暫讀不到，或�
   `IP → domainA → domainB →（broken 期間保留 domainB）→ vault-missing`。
 - **模板情境的傳播延遲**：S1 時 Secret 物件在 `04:38:09Z` 被更新，但掛載檔案到 `04:39:12Z` 才翻成新位址
   → **約 63s 的 kubelet mount 刷新延遲**（secret 物件變更與 pod 內檔案更新之間的正常落差）。
+
+### S6 詳述：HTTPS 憑證 SAN 不符（換 domain 但 SSL 憑證不符合）
+
+用 nginx 做 TLS 終結放在 Vault 前面（`https://...:8443` → `http://vault:8200`），憑證的
+SAN **只簽了 `vault-tls.vault.svc.cluster.local`**。VSO 透過 `VAULT_CACERT` 信任這張自簽 CA。
+
+- baseline：VSO 連 `https://vault-tls.vault.svc.cluster.local:8443`（名稱在 SAN 內）→ TLS 通過、secret 正常同步。
+- 切到 `https://vault-tls-b.vault.svc.cluster.local:8443`（**同一個 nginx、同一張憑證、同一座 Vault**，
+  但這個 domain 不在 SAN）→ VSO 端 Go TLS 驗證直接擋下：
+
+  ```
+  FetchFailed: tls: failed to verify certificate:
+    x509: certificate is valid for vault-tls.vault.svc.cluster.local,
+    not vault-tls-b.vault.svc.cluster.local
+  ```
+
+- **結果與「切到打不到的位址」(S3) 完全一樣**：fetch 失敗、CR 標 `FetchFailed`，但既有 K8s Secret
+  **不刪、不變**（helloworld rv 仍 1887、`foo=bar`），consumer 零 FAIL。application 無感，只是停止刷新。
+- 旁路（S6b）：加 `VAULT_SKIP_VERIFY=true`（operator 透過 `api.DefaultConfig()` 讀此 env）後，
+  即使憑證不符也能連上、~17s 恢復。**這是放棄 TLS 驗證、不安全**，正式做法應是「重簽含新 SAN 的憑證」
+  或「沿用憑證涵蓋的名稱」，而非 skip-verify。
+
+> 這是真實世界「IP→domain」最常見的破壞點：原本用 IP（或舊 domain）連、憑證沒簽新名稱，
+> 一換 domain 就 x509 失敗。好消息是它**不會弄丟 application 的 secret**，只會讓它停在最後一次成功的值。
 
 ## 結論
 
@@ -69,8 +96,9 @@ application 不會受影響：secret 不會消失、不會變空、值不變、�
    若 application 把這個值當連線目標或拿去比對，行為就會改變。要避免就別把位址放進模板。
 2.5. （同理）若 application 用 `subPath` 掛載該 secret，K8s 的 subPath 掛載**不會**自動刷新，
    即使 secret 變了也要重啟 pod 才會看到——這會放大上一點的影響。本實驗用一般 volume 掛載（會刷新）。
-3. **切到「打不到」的新位址**（DNS 解析失敗、TLS 不符、網路不通）時，**既有 secret 不會消失**，
-   只會「停止刷新（stale）」並在 CR 標 `FetchFailed`；新位址恢復可達後會自動補上（S3 證實）。
+3. **切到「打不到」的新位址**（DNS 解析失敗、**SSL 憑證 SAN 不符**、網路不通）時，**既有 secret 不會消失**，
+   只會「停止刷新（stale）」並在 CR 標 `FetchFailed`；新位址恢復可達後會自動補上（S3 與 S6 證實）。
+   換 domain 時最常見的就是憑證沒簽新名稱導致 x509 失敗（S6），解法是重簽含新 SAN 的憑證，別用 skip-verify。
    真正的風險不是「secret 消失」，而是「在你沒注意到的情況下 secret 停止更新」——
    要監控 `kube_customresource` / CR 的 `SucceededReason=FetchFailed` 或 operator 的 reconcile error。
 4. **rollout 期間的短暫空窗**：切換時舊 VSO pod 被新 pod 取代，這幾秒內沒有 operator 在 reconcile；

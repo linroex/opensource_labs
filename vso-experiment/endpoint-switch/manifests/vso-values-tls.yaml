@@ -1,0 +1,23 @@
+# VSO 1.26.0 — HTTPS phase. Trust the experiment CA; talk to the TLS proxy.
+image:
+  repository: ghcr.io/ricoberger/vault-secrets-operator
+  tag: v1.26.0
+  pullPolicy: IfNotPresent
+  volumeMounts:
+    - name: vault-ca
+      mountPath: /etc/vault-ca
+      readOnly: true
+volumes:
+  - name: vault-ca
+    secret:
+      secretName: vault-ca
+vault:
+  # baseline: domain that MATCHES the cert SAN
+  address: "https://vault-tls.vault.svc.cluster.local:8443"
+  authMethod: token
+  reconciliationTime: 30
+environmentVars:
+  - {name: VAULT_TOKEN, value: "root"}
+  - {name: VAULT_TOKEN_LEASE_DURATION, value: "86400"}
+  - {name: VAULT_RENEW_TOKEN, value: "false"}
+  - {name: VAULT_CACERT, value: "/etc/vault-ca/ca.crt"}
