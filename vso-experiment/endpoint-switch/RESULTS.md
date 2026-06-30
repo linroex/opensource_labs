@@ -106,6 +106,32 @@ SAN **只簽了 `vault-tls.vault.svc.cluster.local`**。VSO 透過 `VAULT_CACERT
    liveness 重啟。重啟也救不了「Vault 連不上」，只會進入 CrashLoop，但至少這個訊號看得到。
 3. `/readyz`（門檻 5）比 `/healthz`（門檻 10）早一半翻 500，可當較早的預警。
 
+### S8：`VAULT_RECONCILIATION_TIME` 的作用 & 啟動時 Vault 連不上會不會 Ready
+
+**`VAULT_RECONCILIATION_TIME`（chart `vault.reconciliationTime`，秒，預設 0）**
+— 啟動時讀進 package 變數 `vault.ReconciliationTime`（`vault/vault.go:56`），在 reconcile **成功**後決定要不要
+週期性重排：`vaultsecret_controller.go:72-76` 回傳 `ctrl.Result{RequeueAfter: N 秒}`。
+- `> 0`：每 N 秒把每個 VaultSecret 重新讀一次 Vault → Vault 端的值改了，K8s Secret 會在 ≤N 秒內跟上（**輪詢式同步**）。本實驗設 30，log 才會每 30s 看到一次 `Read secret`。
+- `0`：關閉週期重排。K8s Secret 只在 **CR 的 spec 變動**（generation 改變，`ignorePredicate` 只放行 generation 變化）或 **operator 重啟** 時才重新同步。→ 若只改 Vault 裡的值、不動 CR，K8s Secret **不會自動更新**。
+- 注意：它只影響「成功路徑」的重排間隔；reconcile **失敗**時 controller-runtime 會用自己的指數退避重試（與此值無關）。PKI engine 則改用憑證到期時間當重排依據（`:178-183`），不吃這個值。
+- （細節）程式碼註解寫「requeue only if no version is specified」，但實際上 `reconcileResult` 不論有沒有
+  `spec.version` 都照樣帶 `RequeueAfter`；註解與行為略有出入，pin version 的 secret 仍會被週期重讀。
+
+**啟動時 Vault 就連不上，pod 會 Ready 嗎？→ 看 auth method：**
+
+| auth method | 啟動時是否連 Vault | Vault 連不上時的結果 |
+|---|---|---|
+| **token**（本實驗用） | `CreateClient` **不連** Vault，只建 client、設 token（`vault.go:133-186`） | pod 照常啟動、**~5s 就 Ready=True**；readyz 只看 token 續租失敗數(=0) → 200。**即使一個 secret 都抓不到（CR 全 `FetchFailed`），仍回報 Ready。** |
+| **kubernetes / approle / aws / gcp / azure** | `CreateClient` 啟動時就 **向 Vault 登入**（如 `auth/kubernetes/login`，`vault.go:223`） | 登入失敗 → `InitSharedClient` 回 error → `main.go:60` **`os.Exit(1)`** → `Error` / **CrashLoopBackOff、永遠不會 Ready**。 |
+
+實測（Vault scale 到 0 後冷啟動 VSO）：
+- token auth：pod `1/1 Running`、`Ready=True`、0 重啟，但 CR `FetchFailed: connect: connection refused`、實際抓不到 secret。
+- kubernetes auth：pod `0/1 Error` → CrashLoop，log：`Could not create API client for Vault ... /v1/auth/kubernetes/login: connection refused`。
+
+**結論**：用 **token auth** 時，「Pod Ready」**完全不保證** VSO 連得到 Vault、也不保證 secret 同步正常
+（Ready 只代表 token 續租沒爆門檻）。要確認 VSO 真的在工作，看 VaultSecret CR 的 `FetchFailed`，別只看 Pod Ready。
+反之用 **kubernetes/approle 等需登入的 auth**，啟動時連不到 Vault 會直接 CrashLoop——這時「沒 Ready」反而是個明確訊號。
+
 ## 結論
 
 **對「同一座 Vault」改 endpoint（IP↔domain、A↔B domain），只要新位址可達，掛載 secret 的
