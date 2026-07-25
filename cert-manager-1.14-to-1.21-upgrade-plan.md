@@ -108,7 +108,8 @@
 - **影響**：任何**沒有明確設定** `spec.privateKey.rotationPolicy` 的 Certificate，在 1.18 之後**下一次續期或重簽時會產生全新的私鑰**。這作用於「controller 端」、依 feature gate `DefaultPrivateKeyRotationPolicyAlways`（1.18 預設開啟）判斷，**不會改寫已存在物件的 YAML**。
 - **不可逆時間點**：此 gate 在 **v1.20 GA 且無法再關閉**。所以「維持舊行為」的唯一持久做法是**在每個相關 Certificate 上明確寫 `rotationPolicy: Never`**（關 gate 只是暫時手段，1.20 後失效）。
 - **誰會痛**：有「私鑰指紋綁定 / key pinning」、把私鑰掛載進其他系統、或 HSM 綁定的應用。對純 TLS 伺服憑證通常無害（反而更安全）。
-- **行動**：**在第 4 個 hop（→1.18）之前**，用第 10 節的稽核指令列出所有缺 `rotationPolicy` 的 Certificate，逐一評估其消費端；需要保留舊私鑰的就明確設 `Never`。
+- **行動**：**在第 4 個 hop（→1.18）之前**，用第 9.3 節的稽核指令列出所有缺 `rotationPolicy` 的 Certificate。**最穩的策略是把「每一張」Certificate 都明確寫上 `rotationPolicy`（`Never` 或 `Always`，依消費端逐一判定）——讓這個預設值變更徹底變成 no-op**，而不是只處理需要 `Never` 的那幾張。欄位補齊後，1.18 和 1.20 的 gate 演進都與你無關。
+- **連帶提醒**：對「接受輪替」的憑證，確認消費端會重載——掛載 Secret 的 Pod 會自動收到更新檔案，但**應用程式若把憑證/私鑰快取在記憶體，需要能熱重載或接受重啟**；這在 1.18 之後會從「續期時偶爾發生」變成「每次續期都發生」。
 
 ### 4.2 【v1.18】revisionHistoryLimit 預設 → 1
 - **影響**：升級後，未明確設定此欄位的 Certificate 會把多餘的舊 `CertificateRequest` 垃圾回收，只留 1 份。一般無害（只是歷史紀錄變少），但若你有稽核/除錯流程依賴舊 CertificateRequest，要先撈出來或明確加大該值。
@@ -145,7 +146,7 @@
 > ACME / Let's Encrypt / Venafi 專屬變更一律略過或標註「ACME-only 可忽略」。
 
 ### v1.15.5（"Vault" 版）
-- **Helm**：`installCRDs` 被 `crds.enabled`（預設 false）+ `crds.keep`（預設 true）取代（詳見第 8 節）。`installCRDs` 仍可用但已 deprecated；**同時設 `installCRDs` 與 `crds.enabled` 會讓 chart 直接報錯**。
+- **Helm**：`installCRDs` 被 `crds.enabled`（預設 false）+ `crds.keep`（預設 true）取代（詳見第 7.2 節）。`installCRDs` 仍可用但已 deprecated；**同時設 `installCRDs` 與 `crds.enabled` 會讓 chart 直接報錯**。
 - **startupapicheck** 換 image：`quay.io/jetstack/cert-manager-startupapicheck`（舊 `cert-manager-ctl` 停用）——**air-gapped mirror 要補這個 image**。`cmctl` 移到獨立 repo。
 - **Vault**：新增 mTLS（`clientCertSecretRef`/`clientKeySecretRef`）與 Kubernetes auth 的 token audiences（`serviceAccountRef.audiences`）。皆為 opt-in，不影響既有設定。
 - **Gateway API** gate 改為 `--enable-gateway-api` flag（ACME 相關，可忽略）。
@@ -176,7 +177,7 @@
 
 ### v1.19.6
 - **【嚴重】不要停在 1.19.0**：issuerRef 省略 kind/group 時 CRD 預設值會誤觸**大量重新簽發（續期風暴）**——這對 Vault 憑證一視同仁。1.19.1 已 revert，官方明文「never install v1.19.0」。
-- **緩解做法**：跨 1.19/1.20 前，**把所有 Certificate 的 `issuerRef` 明確補上 `kind` 與 `group`**（1.20 又把預設值加回來）。
+- **緩解做法**：跨 1.19 前，**把所有 Certificate 的 `issuerRef` 明確補上 `kind` 與 `group`**。註：此 API 預設值功能在 1.19.1 被 revert 後，**1.20.0 也維持 revert**（release notes 原文「Revert API defaults for issuer reference kind and group」）——所以補齊 kind/group 是防禦性措施（未來版本很可能重新引入此預設值），不是 1.20 的硬需求。
 - Vault issuer 本身無 runtime 變更（僅測試框架換 client）。
 - 1.19.3 起：簽發後會**驗證憑證公鑰與私鑰相符**才儲存，失敗改為 backoff（適用所有 issuer 含 Vault，防無限重簽）。
 - gate `CAInjectorMerging` 升 Beta 預設開（cainjector 改為「合併」而非「取代」CA bundle，webhook/CA 輪替更平滑）。
@@ -287,8 +288,27 @@ kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/
 helm upgrade ... --set crds.enabled=false ...
 ```
 > `--reset-then-reuse-values` 是官方推薦，但它會把**舊 values 全程帶著走 7 個 hop**——這正是第 11 節（feature gate 清理）的風險來源。
+> **更推薦的替代做法**：如果你的 values 本來就有版控（git 裡有一份完整的 `your-values.yaml`），就**不要用** reuse 類 flag，每個 hop 直接 `-f your-values.yaml` 明確指定——values 的演進（逐 hop 清理）也跟著進版控，狀態完全可預期。兩種模式擇一，不要混用。
+
+**工具前置需求**：
+- `--reset-then-reuse-values` 需要 **Helm ≥ 3.14**；`oci://` chart 來源需要 **Helm ≥ 3.8**。升級戰役開始前先確認執行環境的 Helm 版本。
+- OCI chart 可用性已逐一驗證（2026-07-24，quay.io manifest HTTP 200）：`v1.14.7`～`v1.21.0` 全部 8 個 hop 版本都存在於 `oci://quay.io/jetstack/charts/cert-manager`。傳統的 `https://charts.jetstack.io` 也同樣可用，作為備援。
 
 ---
+
+### 7.4 若 cert-manager 由 GitOps（Argo CD / Flux）管理 —— 機制差異
+本計畫的指令以「直接下 `helm upgrade`」為基準。若實際上是 Argo CD / Flux 在管 cert-manager，**觀念不變（hop 順序、values 清理、驗證關卡全部相同），但操作機制要對應調整**：
+
+| 本計畫的做法 | GitOps 對應 |
+|---|---|
+| `helm upgrade --version vX.Y.Z` | 改 git 裡的 `targetRevision` / `HelmRelease.spec.chart.version`，一次一個 hop，逐 hop 開 PR |
+| `--reset-then-reuse-values` | 不適用——values 本來就在 git，逐 hop 直接改 values 檔（反而更乾淨，第 11 節的清理直接進版控） |
+| `helm rollback <revision>` | **不可用**。回滾 = `git revert` 該 hop 的 commit + sync。Argo CD 的 rollback 功能對啟用 auto-sync 的 app 無效，要先關 auto-sync |
+| `helm template` 預檢 | Argo CD 的 diff / dry-run（`argocd app diff`）；1.16+ 的 values schema 驗證在 render 階段一樣會生效 |
+| Helm hooks（startupapicheck） | Argo CD 會把 `helm.sh/hook` 映射成 Argo hook（post-install → PostSync）；行為略有差異，建議直接 `startupapicheck.enabled=false`，用自己的 smoke test 把關 |
+| CRD 隨 chart 套用 | Argo CD 對大型 CRD 建議開 **Server-Side Apply**（`syncOptions: [ServerSideApply=true]`），避免 annotation 大小與 diff 問題 |
+
+另外：**升級戰役期間建議關閉 auto-sync / self-heal**（逐 hop 手動 sync），避免 Argo 在你觀察期自動把任何東西「修」回去，也讓每個 hop 的變更邊界清楚。
 
 ## 8.〔操作〕升級視窗機制與 HA 設計
 
@@ -330,9 +350,10 @@ helm upgrade ... --set crds.enabled=false ...
 - **262KB annotation 上限**：1.18–1.21 的 CRD 檔案很大，但最大的單一 CRD（clusterissuers）約 147KB compact JSON，**仍在 262144-byte 的 `last-applied-configuration` 上限內**，所以 client-side `kubectl apply` 可正常運作。若你的環境曾因其他大型 CRD 遇過此限制，或想避免風險，**用 `kubectl apply --server-side --force-conflicts`** 最保險（server-side apply 不受該 annotation 限制）。
 
 ### 8.4 startupapicheck Job
-- chart 內建 `startupapicheck` 是一個 Helm hook Job，每次 `helm upgrade` 都會重跑，用來確認 API 已就緒；它會**阻塞 release 完成**直到通過（預設有重試與 timeout）。
-- **1.15 hop 注意**：它的 image 從舊的 `cert-manager-ctl` 改名為 **`cert-manager-startupapicheck`**（`quay.io/jetstack/cert-manager-startupapicheck`）。**air-gapped / 私有 registry 環境必須先 mirror 這個新 image**，否則 1.15 升級會卡在 startupapicheck 拉不到 image。
-- 若你的環境不需要它（例如有自己的就緒檢查），可用 `startupapicheck.enabled=false` 關閉以簡化升級。
+- chart 內建 `startupapicheck` 是一個 Helm hook Job，但**預設的 hook 只有 `post-install`**（已核對 v1.21.0 chart values.yaml：`helm.sh/hook: post-install`）——**也就是說預設情況下它只在全新 `helm install` 時跑，7 個 hop 的 `helm upgrade` 期間根本不會執行**，不能把它當成升級的驗證關卡。每個 hop 的把關要靠 `kubectl rollout status` + 第 9.4 節的 Vault 簽發 smoke test。
+- 例外：若你曾自訂 `startupapicheck.jobAnnotations` 加了 `post-upgrade`，它才會在升級時跑並阻塞 release 直到 API 就緒。
+- **1.15 hop 注意**：它的 image 從舊的 `cert-manager-ctl` 改名為 **`cert-manager-startupapicheck`**（`quay.io/jetstack/cert-manager-startupapicheck`）。預設 hook 下升級不會拉這個 image，但 **air-gapped / 私有 registry 環境仍建議 mirror**（未來重裝或開啟 post-upgrade hook 時會用到）。
+- 若確定不需要它，可用 `startupapicheck.enabled=false` 關閉以簡化升級。
 
 ---
 
@@ -392,8 +413,8 @@ kubectl delete ns cm-smoke
 
 ### 9.5 續期風暴 / Vault 失敗告警（Prometheus 範例）
 ```promql
-# 續期風暴：CertificateRequest 建立速率異常
-sum(rate(certmanager_controller_sync_call_count{controller="certificaterequests-issuer"}[5m])) > 5
+# 續期風暴：CertificateRequest 簽發 reconcile 速率異常（Vault 的 controller 名稱為 certificaterequests-issuer-vault）
+sum(rate(certmanager_controller_sync_call_count{controller=~"certificaterequests-issuer-.*"}[5m])) > 5
 
 # 大量憑證變成 NotReady（升級後最該盯的）
 sum(certmanager_certificate_ready_status{condition="False"}) > 0
@@ -445,7 +466,7 @@ count(certmanager_certificate_expiration_timestamp_seconds - time() < 3*24*3600)
 ### 11.2 Feature Gate 生命週期時間軸（1.14 → 1.21）
 | Gate | 事件 | 若舊 config 帶著它的後果 |
 |---|---|---|
-| `ExperimentalGatewayAPISupport` | 1.15 改用 `--enable-gateway-api` flag（gate 用法改變） | 視版本可能不再被接受；改用 flag / `config.enableGatewayAPI` |
+| `ExperimentalGatewayAPISupport` | 1.15 升 Beta 預設開，但「啟用功能」改由 `--enable-gateway-api` flag 控制 | gate 本身在 1.15 仍被接受（無 CrashLoop 風險）；沒用 Gateway API 就從 values 移除，有用則加上 flag（1.21 起為 `config.gatewayAPI.enabled`） |
 | `ValidateCAA` | 1.17 deprecated → **1.18 移除** | **1.18 hop 起 CrashLoop**（unrecognized gate） |
 | `DefaultPrivateKeyRotationPolicyAlways` | 1.18 Beta（可關）→ **1.20 GA 鎖定** | 若你在 1.18/1.19 設了 `=false`，**1.20 hop 起 CrashLoop**（GA 後不可再設值）→ 必須在 1.20 前移除此 override，改用「每個 Certificate 明確設 `rotationPolicy: Never`」 |
 | `ServerSideApply` | **1.21 deprecated**（cainjector SSA 改無條件） | 1.21 起應移除；deprecated 通常先警告，但下一版可能移除 → 及早清掉 |
@@ -504,8 +525,13 @@ cert-manager **官方沒有任何回滾/降版文件**——以下為經實機�
 ```bash
 # 1) 官方 backup（排除 CertificateRequests/Orders/Challenges）
 kubectl get --all-namespaces -o json issuer,clusterissuer,cert > backup-preHop.json
-# 2) Vault issuer 引用的 Secret（token/appRole/client-cert/CA bundle）+ 所有憑證 Secret
-kubectl get secret -A -o yaml > backup-secrets-preHop.yaml
+# 2) 憑證 Secret（只撈 cert-manager 簽發的：以 annotation 篩選，避免全叢集 Secret dump）
+kubectl get secret -A -o json | jq '[.items[]
+  | select(.metadata.annotations["cert-manager.io/certificate-name"] != null)]' \
+  > backup-cert-secrets-preHop.json
+# 2b) Vault issuer 引用的認證 Secret（token/appRole/client-cert/CA bundle——名單來自第 6.3 節稽核輸出）
+kubectl get secret -n <issuer-secret-ns> <vault-auth-secret...> -o yaml > backup-issuer-secrets-preHop.yaml
+# ⚠️ 備份檔含私鑰與 Vault 憑證，落地位置要加密且限制存取
 # 3) CRD 定義
 kubectl get crd certificates.cert-manager.io certificaterequests.cert-manager.io \
   issuers.cert-manager.io clusterissuers.cert-manager.io \
@@ -520,6 +546,11 @@ helm history cert-manager -n cert-manager > backup-history-preHop.txt
 ## 13. 建議執行時序（把前面所有東西串起來）
 
 ### 階段 0：準備（不動生產）
+0. **盤點現況安裝方式**（整份計畫的路徑選擇取決於此）：
+   - `helm list -A | grep cert-manager` → release 名稱、namespace、chart 版本；`helm get values` 取得現行 values（若 values 沒有版控，這就是起點基準）。
+   - CRD 是 Helm 管的還是靜態 `kubectl apply` 的？（`kubectl get crd certificates.cert-manager.io -o jsonpath='{.metadata.labels}'`——有 `app.kubernetes.io/managed-by: Helm` 即 Helm 管）→ 決定第 7 節走哪條路。
+   - 是否由 Argo CD / Flux 管理？→ 是的話全程改用第 7.4 節的對應機制。
+   - 確認目前 patch 版本是否已是 1.14.7（不是就先升到 1.14.7 再開始，起點含 Vault 重試修正的 backport）。
 1. 建 staging 叢集，**逐 hop 完整彩排**（含回滾）。cert-manager 對降版零保證，staging 演練是硬需求。
 2. 跑第 6.3 節 Vault 曝險稽核 + 第 9 節 rotationPolicy 稽核，產出「受影響資源清單」。
 3. 盤點生態系元件（approver-policy / trust-manager / csi-driver）版本（第 10 節）。
@@ -545,7 +576,13 @@ helm history cert-manager -n cert-manager > backup-history-preHop.txt
 - 1.21：確認 K8s ≥ 1.33；**升級前補 tokenrequest RBAC**（第 4.4）；更新 Prometheus ServiceMonitor（port 改名 + 移除的 value）；**禁用 `spec.renewal`**（第 5 節 1.21）。
 
 ### 每個 hop 的通用檢查點
-1. 備份（第 12.4）→ 2. `helm template` 驗 values → 3. `helm upgrade` → 4. 等三個 Deployment ready、startupapicheck 通過 → 5. **跑 Vault 簽發 smoke test**（第 9 節）→ 6. 檢查 metrics 無續期風暴、Issuer 皆 Ready=True → 7. 觀察一段時間（建議跨過至少一次自然續期）→ 8. 才進下一個 hop。
+0. **時機檢查**：確認接下來 24h 內沒有大批憑證排定續期（有的話改期，避免升級窗口撞上續期高峰）：
+   ```bash
+   kubectl get certificate -A -o json | jq '[.items[]
+     | select(.status.renewalTime != null)
+     | select((.status.renewalTime | fromdateiso8601) < (now + 86400))] | length'
+   ```
+1. 備份（第 12.4）→ 2. `helm template` 驗 values（記住抓不到 `config.*`，見 11.4）→ 3. `helm upgrade` → 4. 三個 Deployment rollout 完成、無 CrashLoop → 5. **跑 Vault 簽發 smoke test**（第 9.4，驗證「新簽發」路徑）→ 6. **對一張常駐 canary 憑證跑 `cmctl renew`，驗證「續期」路徑**（不要等自然續期——7 個 hop 每個都等不現實；canary 用短 duration 的專用憑證，強制續期後確認 Ready 且 `not_before` 更新）→ 7. 檢查 metrics：無續期風暴、`certmanager_certificate_ready_status{condition="False"}` 無新增、Issuer 皆 Ready=True → 8. 高風險 hop（1.18、1.19、1.21）建議多觀察一個工作天再進下一個 hop；低風險 hop（1.15/1.16/1.17）驗證通過即可續行。
 
 ---
 
