@@ -1,0 +1,11 @@
+=== BONUS B: spec.renewal.policy Disabled on v1.21.0 (issue #9031) ===
+NAME                                       READY   STATUS             RESTARTS      AGE
+cert-manager-b54b8555b-wfqrd               0/1     CrashLoopBackOff   2 (16s ago)   5m11s
+cert-manager-cainjector-5df5f74d96-2w8wj   1/1     Running            0             5m11s
+cert-manager-webhook-766d658f9-s2gpb       1/1     Running            0             5m11s
+--- controller last state ---
+=== recovery: delete the trigger cert ===
+NAME                                       READY   STATUS    RESTARTS   AGE
+cert-manager-b54b8555b-g8p4s               1/1     Running   0          26s
+cert-manager-cainjector-5df5f74d96-2w8wj   1/1     Running   0          6m2s
+cert-manager-webhook-766d658f9-s2gpb       1/1     Running   0          6m2s

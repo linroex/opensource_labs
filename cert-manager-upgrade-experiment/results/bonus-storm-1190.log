@@ -1,0 +1,29 @@
+=== BONUS A: deliberate 1.18.6 -> v1.19.0 (renewal storm bug) ===
+--- pre-upgrade serials ---
+cert-legacy serial=23E0C0ACBD74
+cert-pinned serial=7AEF6157CCB6
+cert-ctrlsa serial=14185729417D
+cert-approle serial=56B87987F9F7
+cert-manager v1.19.0 has been deployed successfully!
+--- post-1.19.0 serials (watch cert-legacy!) ---
+cert-legacy serial=23E0C0ACBD74 notBefore='Jul 25 03:55:06 2026 GMT'
+cert-pinned serial=7AEF6157CCB6 notBefore='Jul 25 03:55:04 2026 GMT'
+cert-ctrlsa serial=14185729417D notBefore='Jul 25 03:56:16 2026 GMT'
+cert-approle serial=56B87987F9F7 notBefore='Jul 25 03:55:06 2026 GMT'
+cert-approle-1
+cert-canary-2
+cert-ctrlsa-1
+cert-legacy-1
+cert-pinned-1
+=== ROLLBACK TEST: helm rollback 1.19.0 -> 1.18.6 ===
+serial=3F71840C49C4DCC674D81F0AC9F1512C66D9F433
+pre: nokind=3F71840C49C4DCC674D81F0AC9F1512C66D9F433 legacy=5A253C80A88767325CD68EA333925CDB20E53CD5
+post: nokind=3F71840C49C4DCC674D81F0AC9F1512C66D9F433 legacy=5A253C80A88767325CD68EA333925CDB20E53CD5
+>>> cert-nokind unchanged
+cert-approle-1
+cert-canary-2
+cert-ctrlsa-1
+cert-legacy-2
+cert-nokind-1
+cert-pinned-1
+MECHANISM: cert-legacy event = 'Fields on existing CertificateRequest resource not up to date: [spec.issuerRef]' at rollback boundary; one-time spurious renewal, private key ALSO rotated (rotationPolicy Always live since 1.18)

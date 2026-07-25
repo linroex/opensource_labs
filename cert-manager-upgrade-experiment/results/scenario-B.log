@@ -1,0 +1,236 @@
+=== B hop1: 1.14.7 -> 1.15.5 (installCRDs -> crds.enabled migration) ===
+WARNING: Kubernetes configuration file is group-readable. This is insecure. Location: /etc/rancher/k3s/k3s.yaml
+WARNING: Kubernetes configuration file is world-readable. This is insecure. Location: /etc/rancher/k3s/k3s.yaml
+Pulled: quay.io/jetstack/charts/cert-manager:v1.15.5
+Digest: sha256:04c06a313c9ef90c1719eba3dff497b5a7d3ff5a86f763570f2972b0e0261f5a
+Release "cert-manager" has been upgraded. Happy Helming!
+NAME: cert-manager
+LAST DEPLOYED: Sat Jul 25 03:56:02 2026
+NAMESPACE: cert-manager
+STATUS: deployed
+REVISION: 2
+TEST SUITE: None
+NOTES:
+cert-manager v1.15.5 has been deployed successfully!
+
+In order to begin issuing certificates, you will need to set up a ClusterIssuer
+or Issuer resource (for example, by creating a 'letsencrypt-staging' issuer).
+
+More information on the different types of issuers and how to configure them
+can be found in our documentation:
+
+https://cert-manager.io/docs/configuration/
+
+For information on how to configure cert-manager to automatically provision
+Certificates for Ingress resources, take a look at the `ingress-shim`
+documentation:
+
+https://cert-manager.io/docs/usage/ingress/
+=== B hop2: 1.15.5 -> 1.16.5, attempt 1 (typo still in values) ===
+WARNING: Kubernetes configuration file is group-readable. This is insecure. Location: /etc/rancher/k3s/k3s.yaml
+WARNING: Kubernetes configuration file is world-readable. This is insecure. Location: /etc/rancher/k3s/k3s.yaml
+Pulled: quay.io/jetstack/charts/cert-manager:v1.16.5
+Digest: sha256:5d5a2739b30525d92c05d53b75744d43fd00f23e4c4b8e526a9126d2e949e02e
+Error: UPGRADE FAILED: values don't meet the specifications of the schema(s) in the following chart(s):
+cert-manager:
+- (root): Additional property replicaCounts is not allowed
+
+--- attempt 2 (typo pruned; targetPort kept — should pass on 1.16) ---
+WARNING: Kubernetes configuration file is group-readable. This is insecure. Location: /etc/rancher/k3s/k3s.yaml
+WARNING: Kubernetes configuration file is world-readable. This is insecure. Location: /etc/rancher/k3s/k3s.yaml
+Pulled: quay.io/jetstack/charts/cert-manager:v1.16.5
+Digest: sha256:5d5a2739b30525d92c05d53b75744d43fd00f23e4c4b8e526a9126d2e949e02e
+Release "cert-manager" has been upgraded. Happy Helming!
+NAME: cert-manager
+LAST DEPLOYED: Sat Jul 25 03:56:38 2026
+NAMESPACE: cert-manager
+STATUS: deployed
+REVISION: 3
+TEST SUITE: None
+NOTES:
+cert-manager v1.16.5 has been deployed successfully!
+
+In order to begin issuing certificates, you will need to set up a ClusterIssuer
+or Issuer resource (for example, by creating a 'letsencrypt-staging' issuer).
+
+More information on the different types of issuers and how to configure them
+can be found in our documentation:
+
+https://cert-manager.io/docs/configuration/
+
+For information on how to configure cert-manager to automatically provision
+Certificates for Ingress resources, take a look at the `ingress-shim`
+documentation:
+
+https://cert-manager.io/docs/usage/ingress/
+=== B hop3: -> v1.17.4 ===
+WARNING: Kubernetes configuration file is group-readable. This is insecure. Location: /etc/rancher/k3s/k3s.yaml
+WARNING: Kubernetes configuration file is world-readable. This is insecure. Location: /etc/rancher/k3s/k3s.yaml
+Pulled: quay.io/jetstack/charts/cert-manager:v1.17.4
+Digest: sha256:d65154bfa18458102b92b412a128063f02324853c5ea202c02bd00239039c47d
+Release "cert-manager" has been upgraded. Happy Helming!
+NAME: cert-manager
+LAST DEPLOYED: Sat Jul 25 03:57:49 2026
+NAMESPACE: cert-manager
+STATUS: deployed
+REVISION: 4
+TEST SUITE: None
+NOTES:
+cert-manager v1.17.4 has been deployed successfully!
+
+In order to begin issuing certificates, you will need to set up a ClusterIssuer
+or Issuer resource (for example, by creating a 'letsencrypt-staging' issuer).
+
+More information on the different types of issuers and how to configure them
+can be found in our documentation:
+
+https://cert-manager.io/docs/configuration/
+
+For information on how to configure cert-manager to automatically provision
+Certificates for Ingress resources, take a look at the `ingress-shim`
+documentation:
+
+https://cert-manager.io/docs/usage/ingress/
+=== B hop4: -> v1.18.6 ===
+WARNING: Kubernetes configuration file is group-readable. This is insecure. Location: /etc/rancher/k3s/k3s.yaml
+WARNING: Kubernetes configuration file is world-readable. This is insecure. Location: /etc/rancher/k3s/k3s.yaml
+Pulled: quay.io/jetstack/charts/cert-manager:v1.18.6
+Digest: sha256:2c26b0824142c0aec34a78c13b8fbc9bd267c2093f123e4c73cbae2a2e4ab6d3
+Release "cert-manager" has been upgraded. Happy Helming!
+NAME: cert-manager
+LAST DEPLOYED: Sat Jul 25 03:58:07 2026
+NAMESPACE: cert-manager
+STATUS: deployed
+REVISION: 5
+TEST SUITE: None
+NOTES:
+⚠️  WARNING: New default private key rotation policy for Certificate resources.
+The default private key rotation policy for Certificate resources was
+changed to `Always` in cert-manager >= v1.18.0.
+Learn more in the [1.18 release notes](https://cert-manager.io/docs/releases/release-notes/release-notes-1.18).
+
+cert-manager v1.18.6 has been deployed successfully!
+
+In order to begin issuing certificates, you will need to set up a ClusterIssuer
+or Issuer resource (for example, by creating a 'letsencrypt-staging' issuer).
+
+More information on the different types of issuers and how to configure them
+can be found in our documentation:
+
+https://cert-manager.io/docs/configuration/
+
+For information on how to configure cert-manager to automatically provision
+Certificates for Ingress resources, take a look at the `ingress-shim`
+documentation:
+
+https://cert-manager.io/docs/usage/ingress/
+=== B hop5: -> v1.19.6 ===
+WARNING: Kubernetes configuration file is group-readable. This is insecure. Location: /etc/rancher/k3s/k3s.yaml
+WARNING: Kubernetes configuration file is world-readable. This is insecure. Location: /etc/rancher/k3s/k3s.yaml
+Pulled: quay.io/jetstack/charts/cert-manager:v1.19.6
+Digest: sha256:5d95e81072636335b7b43fc2517e5336b93b77d41a4c87cbaf291783f03b4a0f
+Release "cert-manager" has been upgraded. Happy Helming!
+NAME: cert-manager
+LAST DEPLOYED: Sat Jul 25 04:06:40 2026
+NAMESPACE: cert-manager
+STATUS: deployed
+REVISION: 9
+TEST SUITE: None
+NOTES:
+⚠️  WARNING: New default private key rotation policy for Certificate resources.
+The default private key rotation policy for Certificate resources was
+changed to `Always` in cert-manager >= v1.18.0.
+Learn more in the [1.18 release notes](https://cert-manager.io/docs/releases/release-notes/release-notes-1.18).
+
+cert-manager v1.19.6 has been deployed successfully!
+
+In order to begin issuing certificates, you will need to set up a ClusterIssuer
+or Issuer resource (for example, by creating a 'letsencrypt-staging' issuer).
+
+More information on the different types of issuers and how to configure them
+can be found in our documentation:
+
+https://cert-manager.io/docs/configuration/
+
+For information on how to configure cert-manager to automatically provision
+Certificates for Ingress resources, take a look at the `ingress-shim`
+documentation:
+
+https://cert-manager.io/docs/usage/ingress/
+=== B hop6: -> v1.20.3 ===
+WARNING: Kubernetes configuration file is group-readable. This is insecure. Location: /etc/rancher/k3s/k3s.yaml
+WARNING: Kubernetes configuration file is world-readable. This is insecure. Location: /etc/rancher/k3s/k3s.yaml
+Pulled: quay.io/jetstack/charts/cert-manager:v1.20.3
+Digest: sha256:ef5cf71fc9494e8b06b2f7450e9e31fcb6b78bca1af415f6e2149e744e98faa2
+Release "cert-manager" has been upgraded. Happy Helming!
+NAME: cert-manager
+LAST DEPLOYED: Sat Jul 25 04:06:58 2026
+NAMESPACE: cert-manager
+STATUS: deployed
+REVISION: 10
+TEST SUITE: None
+NOTES:
+cert-manager v1.20.3 has been deployed successfully!
+
+In order to begin issuing certificates, you will need to set up a ClusterIssuer
+or Issuer resource (for example, by creating a 'letsencrypt-staging' issuer).
+
+More information on the different types of issuers and how to configure them
+can be found in our documentation:
+
+https://cert-manager.io/docs/configuration/
+
+For information on how to configure cert-manager to automatically provision
+Certificates for Ingress resources, take a look at the `ingress-shim`
+documentation:
+
+https://cert-manager.io/docs/usage/ingress/
+
+For information on how to configure cert-manager to automatically provision
+Certificates for Gateway API resources, take a look at the `gateway resource`
+documentation:
+
+https://cert-manager.io/docs/usage/gateway/
+=== B hop7: -> v1.21.0, attempt 1 (targetPort still in values) ===
+WARNING: Kubernetes configuration file is group-readable. This is insecure. Location: /etc/rancher/k3s/k3s.yaml
+WARNING: Kubernetes configuration file is world-readable. This is insecure. Location: /etc/rancher/k3s/k3s.yaml
+Pulled: quay.io/jetstack/charts/cert-manager:v1.21.0
+Digest: sha256:cd55fea42658e54abc25e85a0bc1de229925a5006445f916bfd2c6dc80ac3613
+Error: UPGRADE FAILED: values don't meet the specifications of the schema(s) in the following chart(s):
+cert-manager:
+- prometheus.servicemonitor: Additional property targetPort is not allowed
+
+--- attempt 2 (targetPort pruned) ---
+WARNING: Kubernetes configuration file is group-readable. This is insecure. Location: /etc/rancher/k3s/k3s.yaml
+WARNING: Kubernetes configuration file is world-readable. This is insecure. Location: /etc/rancher/k3s/k3s.yaml
+Pulled: quay.io/jetstack/charts/cert-manager:v1.21.0
+Digest: sha256:cd55fea42658e54abc25e85a0bc1de229925a5006445f916bfd2c6dc80ac3613
+Release "cert-manager" has been upgraded. Happy Helming!
+NAME: cert-manager
+LAST DEPLOYED: Sat Jul 25 04:08:04 2026
+NAMESPACE: cert-manager
+STATUS: deployed
+REVISION: 11
+TEST SUITE: None
+NOTES:
+cert-manager v1.21.0 has been deployed successfully!
+
+In order to begin issuing certificates, you will need to set up a ClusterIssuer
+or Issuer resource (for example, by creating a 'letsencrypt-staging' issuer).
+
+More information on the different types of issuers and how to configure them
+can be found in our documentation:
+
+https://cert-manager.io/docs/configuration/
+
+For information on how to configure cert-manager to automatically provision
+Certificates for Ingress resources, take a look at the `ingress-shim`
+documentation:
+
+https://cert-manager.io/docs/usage/ingress/
+
+For information on how to configure cert-manager to automatically provision
+Certificates for Gateway API resources, take a look at the `gateway resource`
+documentation:
+
+https://cert-manager.io/docs/usage/gateway/

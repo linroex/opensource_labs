@@ -1,0 +1,25 @@
+=== SNAPSHOT B4-at-1.18.6 @ 2026-07-25T03:58:37Z (epoch 1784951917) ===
+--- helm release ---
+cert-manager-v1.18.6 rev=5 status=deployed
+--- pod images ---
+cert-manager-64b45f5bcd-r7n7m	quay.io/jetstack/cert-manager-controller:v1.18.6	Running
+cert-manager-cainjector-b8c7b5546-f4hq8	quay.io/jetstack/cert-manager-cainjector:v1.18.6	Running
+cert-manager-webhook-64c5547cb5-7bzh8	quay.io/jetstack/cert-manager-webhook:v1.18.6	Running
+--- clusterissuers ---
+vault-approle	Ready=True	Vault verified
+vault-ctrl-sa	Ready=True	Vault verified
+vault-dedicated-sa	Ready=True	Vault verified
+--- certificates ---
+cert-legacy Ready=True serial=23E0C0ACBD74 notBefore='Jul 25 03:55:06 2026 GMT' keyhash=9ca4e83c79f8 msg='Certificate is up to date and has not expired'
+cert-pinned Ready=True serial=7AEF6157CCB6 notBefore='Jul 25 03:55:04 2026 GMT' keyhash=08964c8826e3 msg='Certificate is up to date and has not expired'
+cert-canary Ready=True serial=1A67E788E1B5 notBefore='Jul 25 03:55:07 2026 GMT' keyhash=5a5fd074209d msg='Certificate is up to date and has not expired'
+cert-ctrlsa Ready=True serial=14185729417D notBefore='Jul 25 03:56:16 2026 GMT' keyhash=8a3e3b7f8db7 msg='Certificate is up to date and has not expired'
+cert-approle Ready=True serial=56B87987F9F7 notBefore='Jul 25 03:55:06 2026 GMT' keyhash=dd784baf0358 msg='Certificate is up to date and has not expired'
+--- certificaterequests (count per cert) ---
+      1 cert-approle
+      1 cert-canary
+      1 cert-ctrlsa
+      1 cert-legacy
+      1 cert-pinned
+--- crds (renewal field present? = 1.21 schema) ---
+spec.renewal absent

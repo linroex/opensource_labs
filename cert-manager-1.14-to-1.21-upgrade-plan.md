@@ -176,7 +176,7 @@
 - ACME-only（低優先）：HTTP01 Ingress `pathType` 改 `Exact`（1.18.1 加 gate `ACMEHTTP01IngressPathTypeExact` 可關）。
 
 ### v1.19.6
-- **【嚴重】不要停在 1.19.0**：issuerRef 省略 kind/group 時 CRD 預設值會誤觸**大量重新簽發（續期風暴）**——這對 Vault 憑證一視同仁。1.19.1 已 revert，官方明文「never install v1.19.0」。
+- **【嚴重】不要停在 1.19.0**：issuerRef 省略 kind/group 的 Certificate 會被 CRD 預設值誤觸**重新簽發**——這對 Vault 憑證一視同仁。1.19.1 已 revert，官方明文「never install v1.19.0」。**實驗實證（見第 15 節）**：誤重簽不是升級瞬間的可見風暴，而是 **CRD defaulting 在物件被寫入時非對稱持久化造成的「延遲性、逐張、時點不可預測」誤重簽**（事件：`Fields on existing CertificateRequest resource not up to date: [spec.issuerRef]`），且因 1.18 起 rotationPolicy=Always 已生效，**誤重簽會連私鑰一起換掉**——更難監控、傷害更大。
 - **緩解做法**：跨 1.19 前，**把所有 Certificate 的 `issuerRef` 明確補上 `kind` 與 `group`**。註：此 API 預設值功能在 1.19.1 被 revert 後，**1.20.0 也維持 revert**（release notes 原文「Revert API defaults for issuer reference kind and group」）——所以補齊 kind/group 是防禦性措施（未來版本很可能重新引入此預設值），不是 1.20 的硬需求。
 - Vault issuer 本身無 runtime 變更（僅測試框架換 client）。
 - 1.19.3 起：簽發後會**驗證憑證公鑰與私鑰相符**才儲存，失敗改為 backoff（適用所有 issuer 含 Vault，防無限重簽）。
@@ -602,4 +602,12 @@ helm history cert-manager -n cert-manager > backup-history-preHop.txt
 
 ---
 
-*本文件基於 cert-manager 官方 release notes、GitHub releases、官方升級文件，並對關鍵論點做對抗式驗證與 k3s + 真實 Vault（1.16.3 / 1.20.4 / 1.21.4）實機測試。所有版本事實驗證於 2026-07-24。*
+## 15. 實機實驗驗證（直跳 vs 分批）
+
+本計畫的關鍵論點已在 k3s + 真實 Vault 環境完整走過兩條升級路徑驗證——**1.14.7 直跳 1.21.0** 與 **7 hop 逐版升級**，含 11 個實證、1.19.0 誤重簽機制重現、#9031 crash 重現、helm rollback 實測（16 秒完成且 CRD 同步回退）。完整報告、腳本與原始記錄見 [`cert-manager-upgrade-experiment/REPORT.md`](cert-manager-upgrade-experiment/REPORT.md)。
+
+一句話結論：**直跳機械上可行（CRD 純增量所賜），但把 7 個版本的行為變更壓進同一個變更窗、失去逐版歸因能力與近距離回退點；生產環境維持本計畫的分批路徑。**
+
+---
+
+*本文件基於 cert-manager 官方 release notes、GitHub releases、官方升級文件，並對關鍵論點做對抗式驗證與 k3s + 真實 Vault（1.16.3 / 1.20.4 / 1.21.4）實機測試。所有版本事實驗證於 2026-07-24。升級路徑實機驗證於 2026-07-25（見第 15 節）。*
