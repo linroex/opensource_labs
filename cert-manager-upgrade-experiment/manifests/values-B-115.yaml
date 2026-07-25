@@ -1,0 +1,9 @@
+crds:
+  enabled: true
+  keep: true
+replicaCounts: 2
+prometheus:
+  enabled: true
+  servicemonitor:
+    enabled: false
+    targetPort: 9402

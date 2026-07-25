@@ -1,0 +1,177 @@
+# Fixtures：3 種 auth 的 ClusterIssuer + 5 張 Certificate
+# VAULT_ADDR / ROLE_ID 由 apply 腳本 envsubst 代入
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: apps
+---
+# 專用 SA（官方推薦模式）
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: vault-issuer
+  namespace: cert-manager
+---
+# 官方文件要求的 RBAC：允許 cert-manager controller 對「專用 SA」建 token
+# （controller 自己 SA 的等效 Role 在 chart 1.16–1.20 內建、1.21 移除——這正是實驗要觀察的）
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: vault-issuer-tokenrequest
+  namespace: cert-manager
+rules:
+  - apiGroups: [""]
+    resources: ["serviceaccounts/token"]
+    resourceNames: ["vault-issuer"]
+    verbs: ["create"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: vault-issuer-tokenrequest
+  namespace: cert-manager
+subjects:
+  - kind: ServiceAccount
+    name: cert-manager
+    namespace: cert-manager
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: vault-issuer-tokenrequest
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: vault-approle-secret
+  namespace: cert-manager
+stringData:
+  secretId: "${SECRET_ID}"
+---
+# Issuer 1：kubernetes auth，serviceAccountRef 指向 controller 自己的 SA
+# （1.14 需自建 RBAC 才能動；1.16–1.20 chart 內建 Role；1.21 chart 移除 → 會壞）
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: vault-ctrl-sa
+spec:
+  vault:
+    server: ${VAULT_ADDR}
+    path: pki/sign/cm
+    auth:
+      kubernetes:
+        mountPath: /v1/auth/kubernetes
+        role: cm-ctrl
+        serviceAccountRef:
+          name: cert-manager
+---
+# Issuer 2：kubernetes auth，專用 SA（官方推薦；全程應該正常）
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: vault-dedicated-sa
+spec:
+  vault:
+    server: ${VAULT_ADDR}
+    path: pki/sign/cm
+    auth:
+      kubernetes:
+        mountPath: /v1/auth/kubernetes
+        role: cm-dedicated
+        serviceAccountRef:
+          name: vault-issuer
+---
+# Issuer 3：appRole（對照組；不受 1.20/1.21 任一變更影響）
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: vault-approle
+spec:
+  vault:
+    server: ${VAULT_ADDR}
+    path: pki/sign/cm
+    auth:
+      appRole:
+        path: approle
+        roleId: "${ROLE_ID}"
+        secretRef:
+          name: vault-approle-secret
+          key: secretId
+---
+# cert-legacy：issuerRef 缺 group + 未設 rotationPolicy（最常見的「歷史遺留」寫法）
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: cert-legacy
+  namespace: apps
+spec:
+  secretName: cert-legacy-tls
+  duration: 24h
+  commonName: legacy.lab.internal
+  issuerRef:
+    name: vault-dedicated-sa
+    kind: ClusterIssuer
+---
+# cert-pinned：完整 issuerRef + rotationPolicy Never（金鑰連續性對照組）
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: cert-pinned
+  namespace: apps
+spec:
+  secretName: cert-pinned-tls
+  duration: 24h
+  commonName: pinned.lab.internal
+  privateKey:
+    rotationPolicy: Never
+  issuerRef:
+    name: vault-dedicated-sa
+    kind: ClusterIssuer
+    group: cert-manager.io
+---
+# cert-canary：1h 憑證、55m renewBefore → 每 ~5 分鐘續期一次
+# 未設 rotationPolicy → 用來觀察 1.18 預設值翻轉（Never→Always）對「續期時換不換私鑰」的影響
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: cert-canary
+  namespace: apps
+spec:
+  secretName: cert-canary-tls
+  duration: 1h
+  renewBefore: 55m
+  commonName: canary.lab.internal
+  issuerRef:
+    name: vault-dedicated-sa
+    kind: ClusterIssuer
+    group: cert-manager.io
+---
+# cert-ctrlsa：走 controller-SA issuer（追蹤該模式 1.14 壞→1.16 好→1.21 再壞的弧線）
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: cert-ctrlsa
+  namespace: apps
+spec:
+  secretName: cert-ctrlsa-tls
+  duration: 24h
+  commonName: ctrlsa.lab.internal
+  issuerRef:
+    name: vault-ctrl-sa
+    kind: ClusterIssuer
+    group: cert-manager.io
+---
+# cert-approle：appRole 對照組
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: cert-approle
+  namespace: apps
+spec:
+  secretName: cert-approle-tls
+  duration: 24h
+  commonName: approle.lab.internal
+  issuerRef:
+    name: vault-approle
+    kind: ClusterIssuer
+    group: cert-manager.io

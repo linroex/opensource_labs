@@ -1,0 +1,10 @@
+# 模擬「在 1.14 時代長出來的 values」——包含兩個典型暗雷：
+# 1) replicaCounts（打錯字，正確是 replicaCount）：1.14 無 schema 驗證，默默被忽略
+# 2) prometheus.servicemonitor.targetPort：1.14 合法，1.21 被移除
+installCRDs: true
+replicaCounts: 2
+prometheus:
+  enabled: true
+  servicemonitor:
+    enabled: false
+    targetPort: 9402

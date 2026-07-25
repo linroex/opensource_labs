@@ -1,0 +1,7 @@
+# 直跳 1.21 schema 失敗後的修正：拿掉 replicaCounts(typo) 與 servicemonitor.targetPort
+# 刻意保留 installCRDs: true —— 驗證 deprecated 值在 1.21 是否仍可用
+installCRDs: true
+prometheus:
+  enabled: true
+  servicemonitor:
+    enabled: false

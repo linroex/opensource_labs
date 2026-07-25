@@ -1,0 +1,25 @@
+=== SNAPSHOT A0-baseline-1.14.7 @ 2026-07-25T03:42:16Z (epoch 1784950936) ===
+--- helm release ---
+cert-manager-v1.14.7 rev=1 status=deployed
+--- pod images ---
+cert-manager-9cf6b797d-425jg	quay.io/jetstack/cert-manager-controller:v1.14.7	Running
+cert-manager-cainjector-67fd5f9578-84fwp	quay.io/jetstack/cert-manager-cainjector:v1.14.7	Running
+cert-manager-webhook-5b7d7fbfbd-xjs9b	quay.io/jetstack/cert-manager-webhook:v1.14.7	Running
+--- clusterissuers ---
+vault-approle	Ready=True	Vault verified
+vault-ctrl-sa	Ready=False	Failed to initialize Vault client: while requesting a Vault token using the Kubernetes auth: while requesting a token for the service account /cert-manager: serviceaccounts "cert-manager" is forbidden: User "system:serviceaccount:cert-manager:cert-manager" cannot create resource "serviceaccounts/token" in API group "" in the namespace "cert-manager"
+vault-dedicated-sa	Ready=True	Vault verified
+--- certificates ---
+cert-legacy Ready=True serial=1DA1551613E9 notBefore='Jul 25 03:40:37 2026 GMT' keyhash=15487bf00791 msg='Certificate is up to date and has not expired'
+cert-pinned Ready=True serial=2A761F00F8E3 notBefore='Jul 25 03:40:37 2026 GMT' keyhash=906991642b8a msg='Certificate is up to date and has not expired'
+cert-canary Ready=True serial=162F02497AAE notBefore='Jul 25 03:40:37 2026 GMT' keyhash=e50508854e50 msg='Certificate is up to date and has not expired'
+cert-ctrlsa Ready=False serial= notBefore='' keyhash=e3b0c44298fc msg='Issuing certificate as Secret does not exist'
+cert-approle Ready=True serial=5900CBD16BC4 notBefore='Jul 25 03:37:56 2026 GMT' keyhash=cf2859f43221 msg='Certificate is up to date and has not expired'
+--- certificaterequests (count per cert) ---
+      1 cert-approle
+      1 cert-canary
+      1 cert-ctrlsa
+      1 cert-legacy
+      1 cert-pinned
+--- crds (renewal field present? = 1.21 schema) ---
+spec.renewal absent
