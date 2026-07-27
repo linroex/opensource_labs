@@ -1,0 +1,7 @@
+=== kubectl get nodes -o wide ===
+NAME   STATUS   ROLES                  AGE   VERSION        INTERNAL-IP   EXTERNAL-IP   OS-IMAGE             KERNEL-VERSION   CONTAINER-RUNTIME
+vm     Ready    control-plane,master   57s   v1.30.5+k3s1   192.0.2.2     <none>        Ubuntu 24.04.4 LTS   6.18.5           containerd://1.7.21-k3s2
+
+=== k3s --version ===
+k3s version v1.30.5+k3s1 (9b586704)
+go version go1.22.6
