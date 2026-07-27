@@ -1,0 +1,80 @@
+Evidence pulled from Helm's own source (github.com/helm/helm, main branch, fetched 2026-07-27).
+This documents an ASYMMETRY between how `helm uninstall` and `helm upgrade` decide whether
+to honor `helm.sh/resource-policy: keep`.
+
+=====================================================================
+1) `helm uninstall` — pkg/action/resource_policy.go, filterManifestsToKeep()
+   Called from pkg/action/uninstall.go (deleteRelease()).
+   Operates on `manifests` derived from `releaseutil.SplitManifests(rel.Manifest)` —
+   i.e. the STORED release manifest text (the YAML Helm rendered and saved into the
+   release object at the last `helm install`/`helm upgrade`), NOT a live GET.
+=====================================================================
+
+func filterManifestsToKeep(manifests []releaseutil.Manifest) (keep, remaining []releaseutil.Manifest) {
+	for _, m := range manifests {
+		if m.Head.Metadata == nil || m.Head.Metadata.Annotations == nil || len(m.Head.Metadata.Annotations) == 0 {
+			remaining = append(remaining, m)
+			continue
+		}
+
+		resourcePolicyType, ok := m.Head.Metadata.Annotations[kube.ResourcePolicyAnno]
+		if !ok {
+			remaining = append(remaining, m)
+			continue
+		}
+
+		resourcePolicyType = strings.ToLower(strings.TrimSpace(resourcePolicyType))
+		if resourcePolicyType == kube.KeepPolicy {
+			keep = append(keep, m)
+		}
+	}
+	return keep, remaining
+}
+
+=> CONSEQUENCE: for `helm uninstall` to skip deleting a CRD, the annotation must be
+   present in the manifest Helm already has stored for that release. A `kubectl annotate`
+   applied only to the LIVE object, with no subsequent `helm upgrade` that re-renders
+   the annotation into the stored manifest, does NOT protect the resource from
+   `helm uninstall`.
+
+=====================================================================
+2) `helm upgrade` (resource pruning when a resource disappears from the new chart
+   version's rendered manifest) — pkg/kube/client.go, Client.Update()
+   For resources in `originals` (previous release) but not in `targets` (new release),
+   it calls `info.Get()` — a LIVE GET against the cluster — then reads
+   `metadataAccessor.Annotations(info.Object)` from that freshly-fetched object.
+=====================================================================
+
+	for _, info := range originals.Difference(targets) {
+		...
+		if err := info.Get(); err != nil {
+			...
+			continue
+		}
+		annotations, err := metadataAccessor.Annotations(info.Object)
+		...
+		if annotations != nil && annotations[ResourcePolicyAnno] == KeepPolicy {
+			c.Logger().Debug("skipping delete due to annotation", ...)
+			continue
+		}
+		if err := deleteResource(info, metav1.DeletePropagationBackground); err != nil {
+		...
+
+=> CONSEQUENCE: the upgrade-time pruning path DOES consult the LIVE object's current
+   annotations, not the stored manifest. So a manually `kubectl annotate`d CRD IS
+   protected from being pruned if a later `helm upgrade` stops rendering it (e.g.
+   someone flips `crds.enabled: false` on an upgrade after it was previously true).
+
+=====================================================================
+3) `helm.sh/resource-policy: keep` constant definitions — pkg/kube/resource_policy.go
+=====================================================================
+const ResourcePolicyAnno = "helm.sh/resource-policy"
+const KeepPolicy = "keep"
+
+=====================================================================
+NET TAKEAWAY:
+- uninstall  -> checks the STORED release manifest annotation only.
+- upgrade (prune of removed resources) -> checks a freshly-fetched LIVE object annotation.
+- A raw `kubectl delete crd -l ...` (label sweep) bypasses Helm's delete codepaths
+  entirely; the resource-policy annotation has NO effect on it, regardless of where
+  it's set.
