@@ -1,0 +1,9 @@
+NAME                                                READY   STATUS    RESTARTS   AGE     IP           NODE   NOMINATED NODE   READINESS GATES
+pod/cm-b-cert-manager-cainjector-68cb8b574b-grkpc   1/1     Running   0          4m13s   10.42.0.14   vm     <none>           <none>
+pod/cm-b-cert-manager-566c46b68b-r947h              1/1     Running   0          4m13s   10.42.0.15   vm     <none>           <none>
+pod/cm-b-cert-manager-webhook-67b4dd9488-txdjp      1/1     Running   0          4m13s   10.42.0.16   vm     <none>           <none>
+
+NAME                                           READY   UP-TO-DATE   AVAILABLE   AGE     CONTAINERS                IMAGES                                             SELECTOR
+deployment.apps/cm-b-cert-manager-cainjector   1/1     1            1           4m13s   cert-manager-cainjector   quay.io/jetstack/cert-manager-cainjector:v1.14.7   app.kubernetes.io/component=cainjector,app.kubernetes.io/instance=cm-b,app.kubernetes.io/name=cainjector
+deployment.apps/cm-b-cert-manager              1/1     1            1           4m13s   cert-manager-controller   quay.io/jetstack/cert-manager-controller:v1.14.7   app.kubernetes.io/component=controller,app.kubernetes.io/instance=cm-b,app.kubernetes.io/name=cert-manager
+deployment.apps/cm-b-cert-manager-webhook      1/1     1            1           4m13s   cert-manager-webhook      quay.io/jetstack/cert-manager-webhook:v1.14.7      app.kubernetes.io/component=webhook,app.kubernetes.io/instance=cm-b,app.kubernetes.io/name=webhook

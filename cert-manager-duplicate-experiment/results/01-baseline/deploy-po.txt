@@ -1,0 +1,15 @@
+NAME                                           READY   UP-TO-DATE   AVAILABLE   AGE   CONTAINERS                IMAGES                                             SELECTOR
+deployment.apps/cm-a-cert-manager              1/1     1            1           67s   cert-manager-controller   quay.io/jetstack/cert-manager-controller:v1.14.7   app.kubernetes.io/component=controller,app.kubernetes.io/instance=cm-a,app.kubernetes.io/name=cert-manager
+deployment.apps/cm-a-cert-manager-cainjector   1/1     1            1           67s   cert-manager-cainjector   quay.io/jetstack/cert-manager-cainjector:v1.14.7   app.kubernetes.io/component=cainjector,app.kubernetes.io/instance=cm-a,app.kubernetes.io/name=cainjector
+deployment.apps/cm-a-cert-manager-webhook      1/1     1            1           67s   cert-manager-webhook      quay.io/jetstack/cert-manager-webhook:v1.14.7      app.kubernetes.io/component=webhook,app.kubernetes.io/instance=cm-a,app.kubernetes.io/name=webhook
+deployment.apps/cm-b-cert-manager              1/1     1            1           23s   cert-manager-controller   quay.io/jetstack/cert-manager-controller:v1.14.7   app.kubernetes.io/component=controller,app.kubernetes.io/instance=cm-b,app.kubernetes.io/name=cert-manager
+deployment.apps/cm-b-cert-manager-cainjector   1/1     1            1           23s   cert-manager-cainjector   quay.io/jetstack/cert-manager-cainjector:v1.14.7   app.kubernetes.io/component=cainjector,app.kubernetes.io/instance=cm-b,app.kubernetes.io/name=cainjector
+deployment.apps/cm-b-cert-manager-webhook      1/1     1            1           23s   cert-manager-webhook      quay.io/jetstack/cert-manager-webhook:v1.14.7      app.kubernetes.io/component=webhook,app.kubernetes.io/instance=cm-b,app.kubernetes.io/name=webhook
+
+NAME                                                READY   STATUS    RESTARTS   AGE   IP           NODE   NOMINATED NODE   READINESS GATES
+pod/cm-a-cert-manager-79956b47f7-sw2kb              1/1     Running   0          67s   10.42.0.5    vm     <none>           <none>
+pod/cm-a-cert-manager-cainjector-6c9d6b65df-t2mhg   1/1     Running   0          67s   10.42.0.6    vm     <none>           <none>
+pod/cm-a-cert-manager-webhook-84d5d7749f-rzds7      1/1     Running   0          67s   10.42.0.7    vm     <none>           <none>
+pod/cm-b-cert-manager-566c46b68b-kbtzp              1/1     Running   0          23s   10.42.0.9    vm     <none>           <none>
+pod/cm-b-cert-manager-cainjector-68cb8b574b-dpdd5   1/1     Running   0          23s   10.42.0.10   vm     <none>           <none>
+pod/cm-b-cert-manager-webhook-67b4dd9488-f5rhj      1/1     Running   0          23s   10.42.0.8    vm     <none>           <none>

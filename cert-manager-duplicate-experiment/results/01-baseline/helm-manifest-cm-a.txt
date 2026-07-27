@@ -1,0 +1,105 @@
+kind: ServiceAccount
+  name: cm-a-cert-manager-cainjector
+kind: ServiceAccount
+  name: cm-a-cert-manager
+kind: ServiceAccount
+  name: cm-a-cert-manager-webhook
+kind: CustomResourceDefinition
+  name: certificaterequests.cert-manager.io
+kind: CustomResourceDefinition
+  name: certificates.cert-manager.io
+kind: CustomResourceDefinition
+  name: challenges.acme.cert-manager.io
+kind: CustomResourceDefinition
+  name: clusterissuers.cert-manager.io
+kind: CustomResourceDefinition
+  name: issuers.cert-manager.io
+kind: CustomResourceDefinition
+  name: orders.acme.cert-manager.io
+kind: ClusterRole
+  name: cm-a-cert-manager-cainjector
+kind: ClusterRole
+  name: cm-a-cert-manager-controller-issuers
+kind: ClusterRole
+  name: cm-a-cert-manager-controller-clusterissuers
+kind: ClusterRole
+  name: cm-a-cert-manager-controller-certificates
+kind: ClusterRole
+  name: cm-a-cert-manager-controller-orders
+kind: ClusterRole
+  name: cm-a-cert-manager-controller-challenges
+kind: ClusterRole
+  name: cm-a-cert-manager-controller-ingress-shim
+kind: ClusterRole
+  name: cm-a-cert-manager-cluster-view
+kind: ClusterRole
+  name: cm-a-cert-manager-view
+kind: ClusterRole
+  name: cm-a-cert-manager-edit
+kind: ClusterRole
+  name: cm-a-cert-manager-controller-approve:cert-manager-io
+kind: ClusterRole
+  name: cm-a-cert-manager-controller-certificatesigningrequests
+kind: ClusterRole
+  name: cm-a-cert-manager-webhook:subjectaccessreviews
+kind: ClusterRoleBinding
+  name: cm-a-cert-manager-cainjector
+  name: cm-a-cert-manager-cainjector
+kind: ClusterRoleBinding
+  name: cm-a-cert-manager-controller-issuers
+  name: cm-a-cert-manager-controller-issuers
+kind: ClusterRoleBinding
+  name: cm-a-cert-manager-controller-clusterissuers
+  name: cm-a-cert-manager-controller-clusterissuers
+kind: ClusterRoleBinding
+  name: cm-a-cert-manager-controller-certificates
+  name: cm-a-cert-manager-controller-certificates
+kind: ClusterRoleBinding
+  name: cm-a-cert-manager-controller-orders
+  name: cm-a-cert-manager-controller-orders
+kind: ClusterRoleBinding
+  name: cm-a-cert-manager-controller-challenges
+  name: cm-a-cert-manager-controller-challenges
+kind: ClusterRoleBinding
+  name: cm-a-cert-manager-controller-ingress-shim
+  name: cm-a-cert-manager-controller-ingress-shim
+kind: ClusterRoleBinding
+  name: cm-a-cert-manager-controller-approve:cert-manager-io
+  name: cm-a-cert-manager-controller-approve:cert-manager-io
+kind: ClusterRoleBinding
+  name: cm-a-cert-manager-controller-certificatesigningrequests
+  name: cm-a-cert-manager-controller-certificatesigningrequests
+kind: ClusterRoleBinding
+  name: cm-a-cert-manager-webhook:subjectaccessreviews
+  name: cm-a-cert-manager-webhook:subjectaccessreviews
+  name: cm-a-cert-manager-webhook
+kind: Role
+  name: cm-a-cert-manager-cainjector:leaderelection
+kind: Role
+  name: cm-a-cert-manager:leaderelection
+kind: Role
+  name: cm-a-cert-manager-webhook:dynamic-serving
+kind: RoleBinding
+  name: cm-a-cert-manager-cainjector:leaderelection
+  name: cm-a-cert-manager-cainjector:leaderelection
+kind: RoleBinding
+  name: cm-a-cert-manager:leaderelection
+  name: cm-a-cert-manager:leaderelection
+kind: RoleBinding
+  name: cm-a-cert-manager-webhook:dynamic-serving
+  name: cm-a-cert-manager-webhook:dynamic-serving
+  name: cm-a-cert-manager-webhook
+kind: Service
+  name: cm-a-cert-manager
+kind: Service
+  name: cm-a-cert-manager-webhook
+kind: Deployment
+  name: cm-a-cert-manager-cainjector
+kind: Deployment
+  name: cm-a-cert-manager
+kind: Deployment
+  name: cm-a-cert-manager-webhook
+kind: MutatingWebhookConfiguration
+  name: cm-a-cert-manager-webhook
+kind: ValidatingWebhookConfiguration
+  name: cm-a-cert-manager-webhook

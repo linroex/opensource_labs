@@ -1,0 +1,45 @@
+I0727 06:01:56.698006       1 controller.go:288] "configured acme dns01 nameservers" logger="cert-manager.controller.build-context" nameservers=["10.43.0.10:53"]
+W0727 06:01:56.698273       1 client_config.go:618] Neither --kubeconfig nor --master was specified.  Using the inClusterConfig.  This might not work.
+I0727 06:01:56.704250       1 controller.go:89] "enabled controllers: [certificaterequests-approver certificaterequests-issuer-acme certificaterequests-issuer-ca certificaterequests-issuer-selfsigned certificaterequests-issuer-vault certificaterequests-issuer-venafi certificates-issuing certificates-key-manager certificates-metrics certificates-readiness certificates-request-manager certificates-revision-manager certificates-trigger challenges clusterissuers ingress-shim issuers orders]" logger="cert-manager.controller"
+I0727 06:01:56.704287       1 controller.go:435] "serving insecurely as tls certificate data not provided" logger="cert-manager.controller"
+I0727 06:01:56.704306       1 controller.go:102] "listening for insecure connections" logger="cert-manager.controller" address="0.0.0.0:9402"
+I0727 06:01:56.704712       1 controller.go:182] "starting leader election" logger="cert-manager.controller"
+I0727 06:01:56.704825       1 controller.go:129] "starting metrics server" logger="cert-manager.controller" address="0.0.0.0:9402"
+I0727 06:01:56.704987       1 controller.go:175] "starting healthz server" logger="cert-manager.controller" address="0.0.0.0:9403"
+I0727 06:01:56.706647       1 leaderelection.go:250] attempting to acquire leader lease kube-system/cert-manager-controller...
+I0727 06:03:28.325120       1 leaderelection.go:260] successfully acquired lease kube-system/cert-manager-controller
+I0727 06:03:28.328269       1 controller.go:252] "starting controller" logger="cert-manager.controller" controller="certificates-revision-manager"
+I0727 06:03:28.330870       1 controller.go:252] "starting controller" logger="cert-manager.controller" controller="certificaterequests-issuer-vault"
+I0727 06:03:28.335238       1 controller.go:229] "not starting controller as it's disabled" logger="cert-manager.controller" controller="certificatesigningrequests-issuer-ca"
+I0727 06:03:28.335267       1 controller.go:229] "not starting controller as it's disabled" logger="cert-manager.controller" controller="certificatesigningrequests-issuer-selfsigned"
+I0727 06:03:28.335366       1 controller.go:252] "starting controller" logger="cert-manager.controller" controller="certificaterequests-issuer-venafi"
+I0727 06:03:28.337373       1 controller.go:252] "starting controller" logger="cert-manager.controller" controller="issuers"
+I0727 06:03:28.339684       1 controller.go:252] "starting controller" logger="cert-manager.controller" controller="certificates-issuing"
+I0727 06:03:28.341158       1 controller.go:252] "starting controller" logger="cert-manager.controller" controller="certificates-metrics"
+I0727 06:03:28.342988       1 controller.go:252] "starting controller" logger="cert-manager.controller" controller="certificates-request-manager"
+I0727 06:03:28.345013       1 controller.go:252] "starting controller" logger="cert-manager.controller" controller="certificaterequests-issuer-ca"
+I0727 06:03:28.346712       1 controller.go:229] "not starting controller as it's disabled" logger="cert-manager.controller" controller="certificatesigningrequests-issuer-acme"
+I0727 06:03:28.346738       1 controller.go:229] "not starting controller as it's disabled" logger="cert-manager.controller" controller="certificatesigningrequests-issuer-venafi"
+I0727 06:03:28.346741       1 controller.go:252] "starting controller" logger="cert-manager.controller" controller="challenges"
+I0727 06:03:28.346745       1 controller.go:229] "not starting controller as it's disabled" logger="cert-manager.controller" controller="gateway-shim"
+I0727 06:03:28.351382       1 controller.go:252] "starting controller" logger="cert-manager.controller" controller="ingress-shim"
+I0727 06:03:28.353226       1 controller.go:252] "starting controller" logger="cert-manager.controller" controller="certificates-readiness"
+I0727 06:03:28.355675       1 controller.go:252] "starting controller" logger="cert-manager.controller" controller="certificates-trigger"
+I0727 06:03:28.356724       1 controller.go:252] "starting controller" logger="cert-manager.controller" controller="certificaterequests-issuer-acme"
+I0727 06:03:28.358422       1 controller.go:252] "starting controller" logger="cert-manager.controller" controller="certificaterequests-issuer-selfsigned"
+I0727 06:03:28.360130       1 controller.go:252] "starting controller" logger="cert-manager.controller" controller="clusterissuers"
+I0727 06:03:28.362010       1 controller.go:252] "starting controller" logger="cert-manager.controller" controller="certificaterequests-approver"
+I0727 06:03:28.364214       1 controller.go:252] "starting controller" logger="cert-manager.controller" controller="certificates-key-manager"
+I0727 06:03:28.366307       1 controller.go:229] "not starting controller as it's disabled" logger="cert-manager.controller" controller="certificatesigningrequests-issuer-vault"
+I0727 06:03:28.366718       1 controller.go:252] "starting controller" logger="cert-manager.controller" controller="orders"
+I0727 06:03:28.372484       1 reflector.go:351] Caches populated for *v1.PartialObjectMetadata from k8s.io/client-go@v0.29.0/tools/cache/reflector.go:229
+I0727 06:03:28.374154       1 reflector.go:351] Caches populated for *v1.Issuer from k8s.io/client-go@v0.29.0/tools/cache/reflector.go:229
+I0727 06:03:28.374824       1 reflector.go:351] Caches populated for *v1.PartialObjectMetadata from k8s.io/client-go@v0.29.0/tools/cache/reflector.go:229
+I0727 06:03:28.375113       1 reflector.go:351] Caches populated for *v1.PartialObjectMetadata from k8s.io/client-go@v0.29.0/tools/cache/reflector.go:229
+I0727 06:03:28.375438       1 reflector.go:351] Caches populated for *v1.Ingress from k8s.io/client-go@v0.29.0/tools/cache/reflector.go:229
+I0727 06:03:28.377253       1 reflector.go:351] Caches populated for *v1.Order from k8s.io/client-go@v0.29.0/tools/cache/reflector.go:229
+I0727 06:03:28.384038       1 reflector.go:351] Caches populated for *v1.Challenge from k8s.io/client-go@v0.29.0/tools/cache/reflector.go:229
+I0727 06:03:28.384233       1 reflector.go:351] Caches populated for *v1.Secret from k8s.io/client-go@v0.29.0/tools/cache/reflector.go:229
+I0727 06:03:28.384760       1 reflector.go:351] Caches populated for *v1.CertificateRequest from k8s.io/client-go@v0.29.0/tools/cache/reflector.go:229
+I0727 06:03:28.384991       1 reflector.go:351] Caches populated for *v1.ClusterIssuer from k8s.io/client-go@v0.29.0/tools/cache/reflector.go:229
+I0727 06:03:28.385225       1 reflector.go:351] Caches populated for *v1.Certificate from k8s.io/client-go@v0.29.0/tools/cache/reflector.go:229

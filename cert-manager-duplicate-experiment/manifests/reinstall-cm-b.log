@@ -1,7 +1,7 @@
 WARNING: Kubernetes configuration file is group-readable. This is insecure. Location: /etc/rancher/k3s/k3s.yaml
 WARNING: Kubernetes configuration file is world-readable. This is insecure. Location: /etc/rancher/k3s/k3s.yaml
-NAME: cm-a
-LAST DEPLOYED: Mon Jul 27 05:51:48 2026
+NAME: cm-b
+LAST DEPLOYED: Mon Jul 27 06:01:55 2026
 NAMESPACE: cert-manager
 STATUS: deployed
 REVISION: 1

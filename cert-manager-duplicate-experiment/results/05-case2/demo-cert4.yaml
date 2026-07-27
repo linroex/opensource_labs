@@ -1,0 +1,33 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  annotations:
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {"apiVersion":"cert-manager.io/v1","kind":"Certificate","metadata":{"annotations":{},"name":"demo-cert4","namespace":"demo"},"spec":{"commonName":"demo-cert4.demo.example","dnsNames":["demo-cert4.demo.example"],"issuerRef":{"group":"cert-manager.io","kind":"ClusterIssuer","name":"vault-issuer"},"secretName":"demo-cert4-tls"}}
+  creationTimestamp: "2026-07-27T06:03:53Z"
+  generation: 1
+  name: demo-cert4
+  namespace: demo
+  resourceVersion: "1449"
+  uid: 76cf6c5f-f9d7-48fd-853f-2a9f4947a9ed
+spec:
+  commonName: demo-cert4.demo.example
+  dnsNames:
+  - demo-cert4.demo.example
+  issuerRef:
+    group: cert-manager.io
+    kind: ClusterIssuer
+    name: vault-issuer
+  secretName: demo-cert4-tls
+status:
+  conditions:
+  - lastTransitionTime: "2026-07-27T06:03:53Z"
+    message: Certificate is up to date and has not expired
+    observedGeneration: 1
+    reason: Ready
+    status: "True"
+    type: Ready
+  notAfter: "2026-07-30T06:03:53Z"
+  notBefore: "2026-07-27T06:03:23Z"
+  renewalTime: "2026-07-29T06:03:43Z"
+  revision: 1

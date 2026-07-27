@@ -1,0 +1,8 @@
+customresourcedefinition.apiextensions.k8s.io "certificaterequests.cert-manager.io" deleted (server dry run)
+customresourcedefinition.apiextensions.k8s.io "certificates.cert-manager.io" deleted (server dry run)
+customresourcedefinition.apiextensions.k8s.io "orders.acme.cert-manager.io" deleted (server dry run)
+customresourcedefinition.apiextensions.k8s.io "challenges.acme.cert-manager.io" deleted (server dry run)
+customresourcedefinition.apiextensions.k8s.io "issuers.cert-manager.io" deleted (server dry run)
+customresourcedefinition.apiextensions.k8s.io "clusterissuers.cert-manager.io" deleted (server dry run)
+
+NOTE: executing this for real (without --dry-run) would cascade-delete ALL Certificate, CertificateRequest, Issuer, ClusterIssuer, Order, Challenge custom resources cluster-wide (garbage collection follows CRD deletion), because both cm-a and cm-b share the SAME CRDs (installed once, by cm-a). Kubernetes Secrets holding issued TLS material (e.g. demo-cert-tls) are a separate core API resource and would NOT be deleted by this sweep -- they would survive as orphaned data with no controller to renew them. This action would also break cm-b, since cm-b depends on the same CRDs it does not own.

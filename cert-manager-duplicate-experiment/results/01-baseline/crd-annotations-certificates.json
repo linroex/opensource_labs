@@ -1,0 +1,5 @@
+{
+  "meta.helm.sh/release-name": "cm-a",
+  "meta.helm.sh/release-namespace": "cert-manager"
+}
+NOTE: no helm.sh/resource-policy:keep annotation present in chart v1.14.7 (unlike newer charts) -- CRDs are fully owned by cm-a and would be deleted by 'helm uninstall cm-a' or any label-selector CRD sweep on instance=cm-a.

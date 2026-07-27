@@ -1,0 +1,22 @@
+demo-cert3 was created at CASE2_START (2026-07-27T06:02:50Z), 5 seconds before cm-a's
+deployments were deleted (CASE2_CM_A_DEPLOYS_DELETED at 06:02:55Z). cm-a's controller
+(still running in that 5s window) picked it up and issued it immediately: certificate
+status Ready=True lastTransitionTime=2026-07-27T06:02:50Z, requestor=
+system:serviceaccount:cert-manager:cm-a-cert-manager. Measured reconciliation gap: 0s
+(cm-a serviced the request before its own removal began).
+
+demo-cert4 was created AFTER CASE2_DONE (once cm-a was fully gone and cm-b held the
+leader-election lease). Its CertificateRequest requestor is
+system:serviceaccount:cert-manager:cm-b-cert-manager, and it reached Ready quickly
+(kubectl wait succeeded within the 120s timeout) -- proving cm-b now performs full
+end-to-end issuance after taking over leadership, with no observable functional
+outage across the whole Case 2 window (0 probe FAILs, see results/05-case2/*).
+
+Leader failover timing (lease evidence, results/05-case2/leases-case2-after.yaml):
+  cert-manager-cainjector-leader-election: acquired by cm-b cainjector at 06:03:08.05Z
+    (13s after cm-a deployments deleted at 06:02:55Z)
+  cert-manager-controller: acquired by cm-b controller at 06:03:28.33Z
+    (33s after cm-a deployments deleted at 06:02:55Z; confirmed by controller log line
+    "successfully acquired lease kube-system/cert-manager-controller" in
+    results/05-case2/cm-b-controller-leader-acquire.log)
+  Both leases show leaseTransitions: 1 (single clean handover from cm-a to cm-b).

@@ -1,0 +1,51 @@
+=== BEFORE adoption: CRD annotations (owned by cm-a) ===
+-- certificaterequests.cert-manager.io --
+{"meta.helm.sh/release-name":"cm-a","meta.helm.sh/release-namespace":"cert-manager"}
+-- certificates.cert-manager.io --
+{"meta.helm.sh/release-name":"cm-a","meta.helm.sh/release-namespace":"cert-manager"}
+-- orders.acme.cert-manager.io --
+{"meta.helm.sh/release-name":"cm-a","meta.helm.sh/release-namespace":"cert-manager"}
+-- challenges.acme.cert-manager.io --
+{"meta.helm.sh/release-name":"cm-a","meta.helm.sh/release-namespace":"cert-manager"}
+-- issuers.cert-manager.io --
+{"meta.helm.sh/release-name":"cm-a","meta.helm.sh/release-namespace":"cert-manager"}
+-- clusterissuers.cert-manager.io --
+{"meta.helm.sh/release-name":"cm-a","meta.helm.sh/release-namespace":"cert-manager"}
+=== AFTER patch: CRD annotations (now cm-b) ===
+-- certificaterequests.cert-manager.io --
+{"meta.helm.sh/release-name":"cm-b","meta.helm.sh/release-namespace":"cert-manager"}
+-- certificates.cert-manager.io --
+{"meta.helm.sh/release-name":"cm-b","meta.helm.sh/release-namespace":"cert-manager"}
+-- orders.acme.cert-manager.io --
+{"meta.helm.sh/release-name":"cm-b","meta.helm.sh/release-namespace":"cert-manager"}
+-- challenges.acme.cert-manager.io --
+{"meta.helm.sh/release-name":"cm-b","meta.helm.sh/release-namespace":"cert-manager"}
+-- issuers.cert-manager.io --
+{"meta.helm.sh/release-name":"cm-b","meta.helm.sh/release-namespace":"cert-manager"}
+-- clusterissuers.cert-manager.io --
+{"meta.helm.sh/release-name":"cm-b","meta.helm.sh/release-namespace":"cert-manager"}
+=== helm upgrade cm-b --set installCRDs=true ===
+Release "cm-b" has been upgraded. Happy Helming!
+NAME: cm-b
+LAST DEPLOYED: Mon Jul 27 06:04:47 2026
+NAMESPACE: cert-manager
+STATUS: deployed
+REVISION: 2
+TEST SUITE: None
+NOTES:
+cert-manager v1.14.7 has been deployed successfully!
+
+In order to begin issuing certificates, you will need to set up a ClusterIssuer
+or Issuer resource (for example, by creating a 'letsencrypt-staging' issuer).
+
+More information on the different types of issuers and how to configure them
+can be found in our documentation:
+
+https://cert-manager.io/docs/configuration/
+
+For information on how to configure cert-manager to automatically provision
+Certificates for Ingress resources, take a look at the `ingress-shim`
+documentation:
+
+https://cert-manager.io/docs/usage/ingress/
+EXIT=0

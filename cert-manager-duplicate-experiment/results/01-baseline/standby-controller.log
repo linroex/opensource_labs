@@ -1,0 +1,9 @@
+I0727 05:52:35.115423       1 controller.go:288] "configured acme dns01 nameservers" logger="cert-manager.controller.build-context" nameservers=["10.43.0.10:53"]
+W0727 05:52:35.116271       1 client_config.go:618] Neither --kubeconfig nor --master was specified.  Using the inClusterConfig.  This might not work.
+I0727 05:52:35.119391       1 controller.go:89] "enabled controllers: [certificaterequests-approver certificaterequests-issuer-acme certificaterequests-issuer-ca certificaterequests-issuer-selfsigned certificaterequests-issuer-vault certificaterequests-issuer-venafi certificates-issuing certificates-key-manager certificates-metrics certificates-readiness certificates-request-manager certificates-revision-manager certificates-trigger challenges clusterissuers ingress-shim issuers orders]" logger="cert-manager.controller"
+I0727 05:52:35.122533       1 controller.go:435] "serving insecurely as tls certificate data not provided" logger="cert-manager.controller"
+I0727 05:52:35.122609       1 controller.go:102] "listening for insecure connections" logger="cert-manager.controller" address="0.0.0.0:9402"
+I0727 05:52:35.124116       1 controller.go:182] "starting leader election" logger="cert-manager.controller"
+I0727 05:52:35.126870       1 leaderelection.go:250] attempting to acquire leader lease kube-system/cert-manager-controller...
+I0727 05:52:35.124532       1 controller.go:129] "starting metrics server" logger="cert-manager.controller" address="0.0.0.0:9402"
+I0727 05:52:35.124622       1 controller.go:175] "starting healthz server" logger="cert-manager.controller" address="0.0.0.0:9403"

@@ -1,0 +1,1 @@
+Both cert-manager-controller lease (holderIdentity contains cm-a-cert-manager-...) and cert-manager-cainjector-leader-election lease are held by cm-a's pods. cm-a is the active leader for both leases; cm-b's controller/cainjector are standby.

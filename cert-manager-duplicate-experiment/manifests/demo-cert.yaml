@@ -1,0 +1,14 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: demo-cert
+  namespace: demo
+spec:
+  secretName: demo-cert-tls
+  commonName: demo-cert.demo.example
+  dnsNames:
+    - demo-cert.demo.example
+  issuerRef:
+    name: vault-issuer
+    kind: ClusterIssuer
+    group: cert-manager.io

@@ -1,13 +1,13 @@
 WARNING: Kubernetes configuration file is group-readable. This is insecure. Location: /etc/rancher/k3s/k3s.yaml
 WARNING: Kubernetes configuration file is world-readable. This is insecure. Location: /etc/rancher/k3s/k3s.yaml
 NAME: cm-b
-LAST DEPLOYED: Mon Jul 27 05:48:19 2026
+LAST DEPLOYED: Mon Jul 27 05:52:32 2026
 NAMESPACE: cert-manager
 STATUS: deployed
 REVISION: 1
 TEST SUITE: None
 NOTES:
-cert-manager v1.21.0 has been deployed successfully!
+cert-manager v1.14.7 has been deployed successfully!
 
 In order to begin issuing certificates, you will need to set up a ClusterIssuer
 or Issuer resource (for example, by creating a 'letsencrypt-staging' issuer).
@@ -22,9 +22,3 @@ Certificates for Ingress resources, take a look at the `ingress-shim`
 documentation:
 
 https://cert-manager.io/docs/usage/ingress/
-
-For information on how to configure cert-manager to automatically provision
-Certificates for Gateway API resources, take a look at the `gateway resource`
-documentation:
-
-https://cert-manager.io/docs/usage/gateway/

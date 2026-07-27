@@ -1,0 +1,209 @@
+apiVersion: v1
+items:
+- apiVersion: admissionregistration.k8s.io/v1
+  kind: ValidatingWebhookConfiguration
+  metadata:
+    annotations:
+      cert-manager.io/inject-ca-from-secret: cert-manager/cm-a-cert-manager-webhook-ca
+      meta.helm.sh/release-name: cm-a
+      meta.helm.sh/release-namespace: cert-manager
+    creationTimestamp: "2026-07-27T05:51:50Z"
+    generation: 2
+    labels:
+      app: webhook
+      app.kubernetes.io/component: webhook
+      app.kubernetes.io/instance: cm-a
+      app.kubernetes.io/managed-by: Helm
+      app.kubernetes.io/name: webhook
+      app.kubernetes.io/version: v1.14.7
+      helm.sh/chart: cert-manager-v1.14.7
+    name: cm-a-cert-manager-webhook
+    resourceVersion: "551"
+    uid: 2bdaf841-6148-42c4-b6ec-e0f2cd7c9c7e
+  webhooks:
+  - admissionReviewVersions:
+    - v1
+    clientConfig:
+      caBundle: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUJ3RENDQVVlZ0F3SUJBZ0lRTWZjS3R6Uzh6cW4zMTB0UXhFME1xREFLQmdncWhrak9QUVFEQXpBaU1TQXcKSGdZRFZRUURFeGRqWlhKMExXMWhibUZuWlhJdGQyVmlhRzl2YXkxallUQWVGdzB5TmpBM01qY3dOVFV4TlROYQpGdzB5TnpBM01qY3dOVFV4TlROYU1DSXhJREFlQmdOVkJBTVRGMk5sY25RdGJXRnVZV2RsY2kxM1pXSm9iMjlyCkxXTmhNSFl3RUFZSEtvWkl6ajBDQVFZRks0RUVBQ0lEWWdBRW94T3dIT3dreDBDRG15RTZuaXhJNGsyRGV6RG4KSU1zQXNjRWFQMzdkYlpUb29GNnNCYlQyeDgyb3ZsaUdPVE5HMno0WFVtbVhvUjQ2YzY2d01iY2MvdmdrK1lJMApZUXB3c0NWaWlyZmM2N3N6U2VGT0VtVU5MNFFuWVhBc0oxZlZvMEl3UURBT0JnTlZIUThCQWY4RUJBTUNBcVF3CkR3WURWUjBUQVFIL0JBVXdBd0VCL3pBZEJnTlZIUTRFRmdRVU9ydWlLWEwrZ1N5N2pnaVRWQ0QrdGEwS2FJTXcKQ2dZSUtvWkl6ajBFQXdNRFp3QXdaQUl3WDBQRnl0N2ZCMCtEc0JSZ2NLdWJ3Rmtyang5Y3JkemdHbjVpN0lHWgpSYXQ4WC9jd0NrYTBtdzJJSzJLbGFKeFRBakJVbGZxa3R6MWRCMTRBLzBxVjNjY1I3ZFlsZzQ4cG1iNy80K0tqCjl6WmsrbHBZb2srYk5MNnlyL01QamNDT00xVT0KLS0tLS1FTkQgQ0VSVElGSUNBVEUtLS0tLQo=
+      service:
+        name: cm-a-cert-manager-webhook
+        namespace: cert-manager
+        path: /validate
+        port: 443
+    failurePolicy: Fail
+    matchPolicy: Equivalent
+    name: webhook.cert-manager.io
+    namespaceSelector:
+      matchExpressions:
+      - key: cert-manager.io/disable-validation
+        operator: NotIn
+        values:
+        - "true"
+    objectSelector: {}
+    rules:
+    - apiGroups:
+      - cert-manager.io
+      - acme.cert-manager.io
+      apiVersions:
+      - v1
+      operations:
+      - CREATE
+      - UPDATE
+      resources:
+      - '*/*'
+      scope: '*'
+    sideEffects: None
+    timeoutSeconds: 30
+- apiVersion: admissionregistration.k8s.io/v1
+  kind: ValidatingWebhookConfiguration
+  metadata:
+    annotations:
+      cert-manager.io/inject-ca-from-secret: cert-manager/cm-b-cert-manager-webhook-ca
+      meta.helm.sh/release-name: cm-b
+      meta.helm.sh/release-namespace: cert-manager
+    creationTimestamp: "2026-07-27T05:52:34Z"
+    generation: 2
+    labels:
+      app: webhook
+      app.kubernetes.io/component: webhook
+      app.kubernetes.io/instance: cm-b
+      app.kubernetes.io/managed-by: Helm
+      app.kubernetes.io/name: webhook
+      app.kubernetes.io/version: v1.14.7
+      helm.sh/chart: cert-manager-v1.14.7
+    name: cm-b-cert-manager-webhook
+    resourceVersion: "706"
+    uid: 34c5b886-10c7-454b-b2e6-88781f9898f7
+  webhooks:
+  - admissionReviewVersions:
+    - v1
+    clientConfig:
+      caBundle: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUJ3RENDQVVlZ0F3SUJBZ0lRUUw4TVhSdEFIaEFaMHNDdjhyUzVGVEFLQmdncWhrak9QUVFEQXpBaU1TQXcKSGdZRFZRUURFeGRqWlhKMExXMWhibUZuWlhJdGQyVmlhRzl2YXkxallUQWVGdzB5TmpBM01qY3dOVFV5TXpWYQpGdzB5TnpBM01qY3dOVFV5TXpWYU1DSXhJREFlQmdOVkJBTVRGMk5sY25RdGJXRnVZV2RsY2kxM1pXSm9iMjlyCkxXTmhNSFl3RUFZSEtvWkl6ajBDQVFZRks0RUVBQ0lEWWdBRUtuYnhZanNiSDYwaG82L0MvSFcyS2RIZHBneUIKQlNLK3ZRK2k4VzdKMXkzTms1RVVOakI2QWlLQlBTWGVxMEUvVjJ4eVkwelZCN3ZlRjBUT1BHQjNNTjBsdEY1QwpnTmpFY0E0WE1QOXJlRXlBN21CU2U4eFNaVXlkMUpWUENhODlvMEl3UURBT0JnTlZIUThCQWY4RUJBTUNBcVF3CkR3WURWUjBUQVFIL0JBVXdBd0VCL3pBZEJnTlZIUTRFRmdRVWZJL3FHUE9IdCs3dGJjRnJuRFJ5anB5RC80SXcKQ2dZSUtvWkl6ajBFQXdNRFp3QXdaQUl3TXNQakQ5dUZNbVRTbUpHZDE2aHhoeVNYV0lFYnEvQzEvdVlOZXpBUAp4TjlNUjd1N3piOTljT3hwMW9GZllYNEZBakEzRDE3UHpBa3ZqTEFza1Vwc09QbG1BRDlPNWxNdFFpZ2dxK3JBCnV0ejBueFdSSEREYWttQm9BVlhQdDA0bkxacz0KLS0tLS1FTkQgQ0VSVElGSUNBVEUtLS0tLQo=
+      service:
+        name: cm-b-cert-manager-webhook
+        namespace: cert-manager
+        path: /validate
+        port: 443
+    failurePolicy: Fail
+    matchPolicy: Equivalent
+    name: webhook.cert-manager.io
+    namespaceSelector:
+      matchExpressions:
+      - key: cert-manager.io/disable-validation
+        operator: NotIn
+        values:
+        - "true"
+    objectSelector: {}
+    rules:
+    - apiGroups:
+      - cert-manager.io
+      - acme.cert-manager.io
+      apiVersions:
+      - v1
+      operations:
+      - CREATE
+      - UPDATE
+      resources:
+      - '*/*'
+      scope: '*'
+    sideEffects: None
+    timeoutSeconds: 30
+- apiVersion: admissionregistration.k8s.io/v1
+  kind: MutatingWebhookConfiguration
+  metadata:
+    annotations:
+      cert-manager.io/inject-ca-from-secret: cert-manager/cm-a-cert-manager-webhook-ca
+      meta.helm.sh/release-name: cm-a
+      meta.helm.sh/release-namespace: cert-manager
+    creationTimestamp: "2026-07-27T05:51:50Z"
+    generation: 2
+    labels:
+      app: webhook
+      app.kubernetes.io/component: webhook
+      app.kubernetes.io/instance: cm-a
+      app.kubernetes.io/managed-by: Helm
+      app.kubernetes.io/name: webhook
+      app.kubernetes.io/version: v1.14.7
+      helm.sh/chart: cert-manager-v1.14.7
+    name: cm-a-cert-manager-webhook
+    resourceVersion: "552"
+    uid: 14a9ed4f-c637-4ffa-91ec-563f6dd469f8
+  webhooks:
+  - admissionReviewVersions:
+    - v1
+    clientConfig:
+      caBundle: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUJ3RENDQVVlZ0F3SUJBZ0lRTWZjS3R6Uzh6cW4zMTB0UXhFME1xREFLQmdncWhrak9QUVFEQXpBaU1TQXcKSGdZRFZRUURFeGRqWlhKMExXMWhibUZuWlhJdGQyVmlhRzl2YXkxallUQWVGdzB5TmpBM01qY3dOVFV4TlROYQpGdzB5TnpBM01qY3dOVFV4TlROYU1DSXhJREFlQmdOVkJBTVRGMk5sY25RdGJXRnVZV2RsY2kxM1pXSm9iMjlyCkxXTmhNSFl3RUFZSEtvWkl6ajBDQVFZRks0RUVBQ0lEWWdBRW94T3dIT3dreDBDRG15RTZuaXhJNGsyRGV6RG4KSU1zQXNjRWFQMzdkYlpUb29GNnNCYlQyeDgyb3ZsaUdPVE5HMno0WFVtbVhvUjQ2YzY2d01iY2MvdmdrK1lJMApZUXB3c0NWaWlyZmM2N3N6U2VGT0VtVU5MNFFuWVhBc0oxZlZvMEl3UURBT0JnTlZIUThCQWY4RUJBTUNBcVF3CkR3WURWUjBUQVFIL0JBVXdBd0VCL3pBZEJnTlZIUTRFRmdRVU9ydWlLWEwrZ1N5N2pnaVRWQ0QrdGEwS2FJTXcKQ2dZSUtvWkl6ajBFQXdNRFp3QXdaQUl3WDBQRnl0N2ZCMCtEc0JSZ2NLdWJ3Rmtyang5Y3JkemdHbjVpN0lHWgpSYXQ4WC9jd0NrYTBtdzJJSzJLbGFKeFRBakJVbGZxa3R6MWRCMTRBLzBxVjNjY1I3ZFlsZzQ4cG1iNy80K0tqCjl6WmsrbHBZb2srYk5MNnlyL01QamNDT00xVT0KLS0tLS1FTkQgQ0VSVElGSUNBVEUtLS0tLQo=
+      service:
+        name: cm-a-cert-manager-webhook
+        namespace: cert-manager
+        path: /mutate
+        port: 443
+    failurePolicy: Fail
+    matchPolicy: Equivalent
+    name: webhook.cert-manager.io
+    namespaceSelector: {}
+    objectSelector: {}
+    reinvocationPolicy: Never
+    rules:
+    - apiGroups:
+      - cert-manager.io
+      apiVersions:
+      - v1
+      operations:
+      - CREATE
+      resources:
+      - certificaterequests
+      scope: '*'
+    sideEffects: None
+    timeoutSeconds: 30
+- apiVersion: admissionregistration.k8s.io/v1
+  kind: MutatingWebhookConfiguration
+  metadata:
+    annotations:
+      cert-manager.io/inject-ca-from-secret: cert-manager/cm-b-cert-manager-webhook-ca
+      meta.helm.sh/release-name: cm-b
+      meta.helm.sh/release-namespace: cert-manager
+    creationTimestamp: "2026-07-27T05:52:34Z"
+    generation: 2
+    labels:
+      app: webhook
+      app.kubernetes.io/component: webhook
+      app.kubernetes.io/instance: cm-b
+      app.kubernetes.io/managed-by: Helm
+      app.kubernetes.io/name: webhook
+      app.kubernetes.io/version: v1.14.7
+      helm.sh/chart: cert-manager-v1.14.7
+    name: cm-b-cert-manager-webhook
+    resourceVersion: "707"
+    uid: 084ffda3-cb0d-438e-acc9-5f5c81439fb3
+  webhooks:
+  - admissionReviewVersions:
+    - v1
+    clientConfig:
+      caBundle: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUJ3RENDQVVlZ0F3SUJBZ0lRUUw4TVhSdEFIaEFaMHNDdjhyUzVGVEFLQmdncWhrak9QUVFEQXpBaU1TQXcKSGdZRFZRUURFeGRqWlhKMExXMWhibUZuWlhJdGQyVmlhRzl2YXkxallUQWVGdzB5TmpBM01qY3dOVFV5TXpWYQpGdzB5TnpBM01qY3dOVFV5TXpWYU1DSXhJREFlQmdOVkJBTVRGMk5sY25RdGJXRnVZV2RsY2kxM1pXSm9iMjlyCkxXTmhNSFl3RUFZSEtvWkl6ajBDQVFZRks0RUVBQ0lEWWdBRUtuYnhZanNiSDYwaG82L0MvSFcyS2RIZHBneUIKQlNLK3ZRK2k4VzdKMXkzTms1RVVOakI2QWlLQlBTWGVxMEUvVjJ4eVkwelZCN3ZlRjBUT1BHQjNNTjBsdEY1QwpnTmpFY0E0WE1QOXJlRXlBN21CU2U4eFNaVXlkMUpWUENhODlvMEl3UURBT0JnTlZIUThCQWY4RUJBTUNBcVF3CkR3WURWUjBUQVFIL0JBVXdBd0VCL3pBZEJnTlZIUTRFRmdRVWZJL3FHUE9IdCs3dGJjRnJuRFJ5anB5RC80SXcKQ2dZSUtvWkl6ajBFQXdNRFp3QXdaQUl3TXNQakQ5dUZNbVRTbUpHZDE2aHhoeVNYV0lFYnEvQzEvdVlOZXpBUAp4TjlNUjd1N3piOTljT3hwMW9GZllYNEZBakEzRDE3UHpBa3ZqTEFza1Vwc09QbG1BRDlPNWxNdFFpZ2dxK3JBCnV0ejBueFdSSEREYWttQm9BVlhQdDA0bkxacz0KLS0tLS1FTkQgQ0VSVElGSUNBVEUtLS0tLQo=
+      service:
+        name: cm-b-cert-manager-webhook
+        namespace: cert-manager
+        path: /mutate
+        port: 443
+    failurePolicy: Fail
+    matchPolicy: Equivalent
+    name: webhook.cert-manager.io
+    namespaceSelector: {}
+    objectSelector: {}
+    reinvocationPolicy: Never
+    rules:
+    - apiGroups:
+      - cert-manager.io
+      apiVersions:
+      - v1
+      operations:
+      - CREATE
+      resources:
+      - certificaterequests
+      scope: '*'
+    sideEffects: None
+    timeoutSeconds: 30
+kind: List
+metadata:
+  resourceVersion: ""

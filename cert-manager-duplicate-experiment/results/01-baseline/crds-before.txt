@@ -1,0 +1,26 @@
+customresourcedefinition.apiextensions.k8s.io/certificaterequests.cert-manager.io
+customresourcedefinition.apiextensions.k8s.io/certificates.cert-manager.io
+customresourcedefinition.apiextensions.k8s.io/orders.acme.cert-manager.io
+customresourcedefinition.apiextensions.k8s.io/challenges.acme.cert-manager.io
+customresourcedefinition.apiextensions.k8s.io/issuers.cert-manager.io
+customresourcedefinition.apiextensions.k8s.io/clusterissuers.cert-manager.io
+  annotations:
+    meta.helm.sh/release-name: cm-a
+    meta.helm.sh/release-namespace: cert-manager
+  creationTimestamp: "2026-07-27T05:51:50Z"
+  generation: 1
+  labels:
+--
+                description: Defines annotations and labels to be copied to the Certificate's
+                  Secret. Labels and annotations on the Secret will be changed as
+                  they appear on the SecretTemplate when added or removed. SecretTemplate
+                  annotations are added in conjunction with, and cannot overwrite,
+                  the base set of annotations cert-manager sets on the Certificate's
+                  Secret.
+                properties:
+                  annotations:
+                    additionalProperties:
+                      type: string
+                    description: Annotations is a key value map to be copied to the
+                      target Kubernetes Secret.
+                    type: object

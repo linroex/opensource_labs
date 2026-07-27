@@ -1,0 +1,12 @@
+-- certificaterequests.cert-manager.io --
+{"meta.helm.sh/release-name":"cm-b","meta.helm.sh/release-namespace":"cert-manager"}
+-- certificates.cert-manager.io --
+{"meta.helm.sh/release-name":"cm-b","meta.helm.sh/release-namespace":"cert-manager"}
+-- orders.acme.cert-manager.io --
+{"meta.helm.sh/release-name":"cm-b","meta.helm.sh/release-namespace":"cert-manager"}
+-- challenges.acme.cert-manager.io --
+{"meta.helm.sh/release-name":"cm-b","meta.helm.sh/release-namespace":"cert-manager"}
+-- issuers.cert-manager.io --
+{"meta.helm.sh/release-name":"cm-b","meta.helm.sh/release-namespace":"cert-manager"}
+-- clusterissuers.cert-manager.io --
+{"meta.helm.sh/release-name":"cm-b","meta.helm.sh/release-namespace":"cert-manager"}

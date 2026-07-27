@@ -1,0 +1,33 @@
+apiVersion: v1
+items:
+- apiVersion: coordination.k8s.io/v1
+  kind: Lease
+  metadata:
+    creationTimestamp: "2026-07-27T05:51:53Z"
+    name: cert-manager-cainjector-leader-election
+    namespace: kube-system
+    resourceVersion: "750"
+    uid: 738b4ce2-ee4e-472f-af40-ad23e5c982de
+  spec:
+    acquireTime: "2026-07-27T05:51:53.260845Z"
+    holderIdentity: cm-a-cert-manager-cainjector-6c9d6b65df-t2mhg_91f6db0d-5d60-4a06-a2b4-5163133c5d35
+    leaseDurationSeconds: 60
+    leaseTransitions: 0
+    renewTime: "2026-07-27T05:53:08.384955Z"
+- apiVersion: coordination.k8s.io/v1
+  kind: Lease
+  metadata:
+    creationTimestamp: "2026-07-27T05:51:53Z"
+    name: cert-manager-controller
+    namespace: kube-system
+    resourceVersion: "751"
+    uid: 3e94316e-2988-4d01-a575-98a619ce0d0e
+  spec:
+    acquireTime: "2026-07-27T05:51:53.258393Z"
+    holderIdentity: cm-a-cert-manager-79956b47f7-sw2kb-external-cert-manager-controller
+    leaseDurationSeconds: 60
+    leaseTransitions: 0
+    renewTime: "2026-07-27T05:53:08.372681Z"
+kind: List
+metadata:
+  resourceVersion: ""

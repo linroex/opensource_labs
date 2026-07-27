@@ -1,0 +1,3 @@
+NAME                                      HOLDER                                                                               AGE
+cert-manager-controller                   cm-b-cert-manager-566c46b68b-r947h-external-cert-manager-controller                  14m
+cert-manager-cainjector-leader-election   cm-b-cert-manager-cainjector-68cb8b574b-grkpc_6824bcd8-d2d6-410c-a0bd-f9b3a0a9c42d   14m

@@ -1,0 +1,2 @@
+NAME          APPROVED   DENIED   READY   ISSUER         REQUESTOR                                              STATUS                                         AGE
+demo-cert-1   True                True    vault-issuer   system:serviceaccount:cert-manager:cm-a-cert-manager   Certificate fetched from issuer successfully   9s

@@ -1,0 +1,1 @@
+which controller processed issuance: cm-a (requestor=system:serviceaccount:cert-manager:cm-a-cert-manager, confirmed leader)
