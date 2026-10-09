@@ -1,0 +1,15 @@
+# Vault in *dev mode*: in-memory storage, auto-unsealed, plain HTTP, fixed root token.
+# For test environments only - never use dev mode for anything real.
+global:
+  tlsDisable: true
+injector:
+  enabled: false
+server:
+  dev:
+    enabled: true
+    devRootToken: root
+  # Needed for the Kubernetes auth method (TokenReview) - on by default, kept explicit.
+  authDelegator:
+    enabled: true
+  resources:
+    requests: {cpu: 50m, memory: 128Mi}

@@ -1,0 +1,24 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: demo
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: app-example-com
+  namespace: demo
+spec:
+  secretName: app-example-com-tls
+  commonName: app.example.com
+  dnsNames:
+    - app.example.com
+    - www.app.example.com
+  duration: 1h
+  renewBefore: 30m
+  privateKey:
+    algorithm: ECDSA
+    size: 256
+  issuerRef:
+    kind: ClusterIssuer
+    name: vault-issuer
